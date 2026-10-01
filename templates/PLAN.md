@@ -1,16 +1,30 @@
-# Plan — [Project Name]
+# PLAN — [Nome do Projeto]
 
-## Phase 1: Foundation
-- [ ] Setup project structure
-- [ ] Initialize git and CLAUDE.md
-- [ ] Define data models
+> Estado: `[x]` concluído · `[~]` em progresso · `[ ]` por fazer
 
-## Phase 2: Core
-- [ ] Implement feature A
-- [ ] Implement feature B
-- [ ] Write core tests
+---
 
-## Phase 3: Polish
-- [ ] Error handling
-- [ ] Final testing
-- [ ] Documentation
+## Fase 1 — Fundação
+
+- [ ] Setup do projeto (dependências, estrutura de pastas, git)
+- [ ] Governance files (SPEC.md, PLAN.md, TASKS.md, CLAUDE.md)
+- [ ] Ambiente de desenvolvimento a funcionar (dev server, DB, env vars)
+- [ ] Modelos de dados / schema inicial
+
+## Fase 2 — MVP
+
+- [ ] [Feature core A]
+- [ ] [Feature core B]
+- [ ] [Feature core C]
+- [ ] Testes das funcionalidades core
+
+## Fase 3 — Produção
+
+- [ ] Deploy configurado e funcional
+- [ ] Variáveis de ambiente em produção
+- [ ] Testes de aceitação no ambiente de produção
+
+## Fase 4 — Iteração
+
+- [ ] [Feature adicional baseada em feedback]
+- [ ] [Melhoria de UX / performance]
