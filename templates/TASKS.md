@@ -1,7 +1,9 @@
 # TASKS — [Nome do Projeto]
 
-> Estado: `[x]` concluído · `[~]` em progresso · `[ ]` por fazer  
-> Formato: descrição da task na primeira linha, critério de done em `>` na linha seguinte.
+> Estado: `[x]` concluído · `[~]` em progresso · `[ ]` por fazer · `[!]` bloqueado
+> Formato: título na primeira linha, critério de done em `>` na linha seguinte (obrigatório).
+> Ao concluir, acrescentar a data no fim: `- [x] Título (YYYY-MM-DD)`.
+> Bloqueado: `[!]` e a razão do bloqueio na linha `>`.
 
 ---
 

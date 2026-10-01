@@ -125,7 +125,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── Stats ── */
-  .stats { display: flex; gap: 14px; margin-bottom: 28px; }
+  .stats { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
   .stat {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -151,6 +151,8 @@
   .c-cyan   { color: var(--cyan);   text-shadow: 0 0 15px rgba(0,255,200,.5); }
   .c-yellow { color: var(--yellow); text-shadow: 0 0 15px rgba(255,204,0,.4); }
   .c-green  { color: var(--green);  text-shadow: 0 0 15px rgba(0,255,136,.4); }
+  .c-red    { color: var(--red);    text-shadow: 0 0 15px rgba(255,51,85,.4); }
+  .c-orange { color: var(--orange); text-shadow: 0 0 15px rgba(255,119,34,.4); }
 
   /* ── Toolbar ── */
   .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
@@ -275,6 +277,17 @@
   .badge-missing { border: 1px solid rgba(255,51,85,.2);  color: var(--red);    background: rgba(255,51,85,.04); opacity: .5; }
   .badge-branch  { border: 1px solid rgba(176,96,255,.3); color: var(--purple); background: rgba(176,96,255,.06); }
   .badge-dirty   { border: 1px solid rgba(255,119,34,.3); color: var(--orange); background: rgba(255,119,34,.06); }
+  .badge-phase   { border: 1px solid rgba(56,190,255,.35); color: var(--blue); background: rgba(56,190,255,.06); text-transform: uppercase; }
+  .badge-stale   { border: 1px solid rgba(255,51,85,.4);  color: var(--red);   background: rgba(255,51,85,.08); }
+  .badge-ahead   { border: 1px solid rgba(255,215,64,.35); color: var(--yellow); background: rgba(255,215,64,.06); }
+  .badge-warn    { border: 1px solid rgba(255,215,64,.35); color: var(--yellow); background: rgba(255,215,64,.04); }
+  .pill-blocked  { border: 1px solid rgba(255,51,85,.3);  color: var(--red);   background: rgba(255,51,85,.06); }
+
+  .card.noncompliant { opacity: .55; }
+  .card.noncompliant:hover { opacity: 1; }
+  .card-sub { font-size: 12px; color: var(--muted); margin: -8px 0 12px; font-family: Consolas, 'Courier New', monospace; }
+  .card-sub .warn { color: var(--yellow); }
+  .card-sub .bad  { color: var(--red); }
 
   /* States */
   .empty { grid-column: 1/-1; text-align: center; color: var(--muted); padding: 80px; font-family: Consolas, 'Courier New', monospace; }
@@ -374,6 +387,25 @@
   .manual-task-row { display: flex; gap: 10px; font-size: 16px; padding: 7px 0; align-items: baseline; color: var(--orange); }
   .manual-task-row.done { color: var(--muted); text-decoration: line-through; }
   .manual-task-count { font-size: 10px; opacity: .5; }
+
+  .task-row.blocked { color: var(--red); }
+  .task-reason { display: block; font-size: 12px; opacity: .75; }
+  .task-date { font-size: 11px; opacity: .6; margin-left: 6px; font-family: Consolas, 'Courier New', monospace; }
+
+  .modal-compliance { border: 1px solid rgba(255,215,64,.25); background: rgba(255,215,64,.03); padding: 16px 18px; }
+  .compliance-row { font-size: 14px; padding: 3px 0; display: flex; gap: 10px; }
+  .compliance-row.missing { color: var(--yellow); }
+  .compliance-row.warning { color: var(--muted); }
+  .modal-url { display: inline-block; margin: -16px 0 24px; color: var(--blue); font-family: Consolas, 'Courier New', monospace; font-size: 13px; }
+
+  .log-entry { padding: 10px 0; border-bottom: 1px solid rgba(0,255,200,.08); font-size: 14px; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 4px; }
+  .log-date { color: var(--blue); font-family: Consolas, 'Courier New', monospace; font-size: 12px; flex-shrink: 0; }
+  .log-title { color: var(--text); font-weight: 600; }
+  .log-field { color: var(--muted); padding-left: 2px; }
+  .log-field b { color: var(--text); font-weight: 600; opacity: .8; }
+  .log-field.blocked b { color: var(--red); }
 </style>
 </head>
 <body>
@@ -400,6 +432,8 @@
       <button class="filter active" data-filter="all">All</button>
       <button class="filter" data-filter="active">Active</button>
       <button class="filter" data-filter="incomplete">Incomplete</button>
+      <button class="filter" data-filter="stale">Stale</button>
+      <button class="filter" data-filter="noncompliant">Não conformes</button>
     </div>
     <span class="shown-count" id="shownCount"></span>
   </div>
@@ -453,17 +487,25 @@ function render() {
 function applyFilter(projects, f) {
   if (f === 'active')     return projects.filter(p => p.tasks?.counts.inProgress > 0)
   if (f === 'incomplete') return projects.filter(p => completion(p) < 100)
+  if (f === 'stale')      return projects.filter(p => p.activity.stale)
+  if (f === 'noncompliant') return projects.filter(p => p.compliance.version !== 'v2')
   return projects
 }
 
 function renderStats(projects) {
   const total    = projects.length
+  const v2       = projects.filter(p => p.compliance.version === 'v2').length
   const active   = projects.filter(p => p.tasks?.counts.inProgress > 0).length
   const complete = projects.filter(p => completion(p) === 100).length
+  const stale    = projects.filter(p => p.activity.stale).length
+  const unpushed = projects.filter(p => p.git?.ahead > 0).length
   document.getElementById('stats').innerHTML = `
     <div class="stat"><span class="stat-value c-cyan">${total}</span><span class="stat-label">Total</span></div>
+    <div class="stat"><span class="stat-value c-cyan">${v2}</span><span class="stat-label">Contrato v2</span></div>
     <div class="stat"><span class="stat-value c-yellow">${active}</span><span class="stat-label">Active</span></div>
     <div class="stat"><span class="stat-value c-green">${complete}</span><span class="stat-label">Complete</span></div>
+    <div class="stat"><span class="stat-value c-red">${stale}</span><span class="stat-label">Stale</span></div>
+    <div class="stat"><span class="stat-value c-orange">${unpushed}</span><span class="stat-label">Por push</span></div>
   `
 }
 
@@ -489,8 +531,17 @@ function cardHtml(p) {
     <div class="task-pills">
       ${t.done       ? `<span class="pill pill-done">${t.done}✓</span>` : ''}
       ${t.inProgress ? `<span class="pill pill-wip">${t.inProgress}◐</span>` : ''}
+      ${t.blocked    ? `<span class="pill pill-blocked">${t.blocked}!</span>` : ''}
       ${t.todo       ? `<span class="pill pill-todo">${t.todo}○</span>` : ''}
     </div>` : ''
+
+  const c = p.compliance
+  const idle = p.activity.daysIdle
+  const sub = `
+    <div class="card-sub">
+      ${idle !== null ? `<span class="${p.activity.stale ? 'bad' : ''}">${idle}d sem atividade</span>` : '<span>sem git</span>'}
+      ${c.version !== 'v2' ? ` · <span class="warn">v2: faltam ${c.missing.length}</span>` : ''}
+    </div>`
 
   const commit = lc ? `
     <div class="commit">
@@ -499,26 +550,35 @@ function cardHtml(p) {
       <span class="commit-age">${age(lc.date)}</span>
     </div>` : ''
 
-  const { spec, plan, tasks, claude } = p.contractHealth
+  const { spec, plan, tasks, claude, log } = p.contractHealth
   const branch = p.git?.currentBranch
   const dirty  = p.git?.uncommittedChanges
+  const ahead  = p.git?.ahead
+  const d      = p.deploy
+  const deployCount = [d.dockerfile, d.envExample].filter(Boolean).length
 
   return `
-    <div class="card level-${level}">
+    <div class="card level-${level} ${c.version !== 'v2' ? 'noncompliant' : ''}">
       <div class="card-top">
         <span class="card-name">${esc(p.name)}</span>
         <span class="card-pct level-${level}">${pct}%</span>
       </div>
       <div class="bar"><div class="bar-fill level-${level}" style="width:${pct}%"></div></div>
+      ${sub}
       ${pills}
       ${commit}
       <div class="badges">
+        ${p.phase ? `<span class="badge badge-phase">${esc(p.phase)}</span>` : ''}
+        ${p.activity.stale ? '<span class="badge badge-stale">STALE</span>' : ''}
         ${badge('SPEC',   spec)}
         ${badge('PLAN',   plan)}
         ${badge('TASKS',  tasks)}
         ${badge('CLAUDE', claude)}
+        ${badge('LOG',    log)}
+        ${deployCount ? `<span class="badge ${deployCount === 2 ? 'badge-ok' : 'badge-warn'}">DEPLOY</span>` : ''}
         ${branch ? `<span class="badge badge-branch">${esc(branch)}</span>` : ''}
         ${dirty  ? `<span class="badge badge-dirty">${dirty}~</span>` : ''}
+        ${ahead  ? `<span class="badge badge-ahead">↑${ahead}</span>` : ''}
       </div>
     </div>`
 }
@@ -529,7 +589,8 @@ function badge(label, present) {
 
 function openModal(p) {
   document.getElementById('modalTitle').textContent = p.name
-  document.getElementById('modalSpec').textContent  = p.specSummary ?? ''
+  document.getElementById('modalSpec').innerHTML    = esc(p.specSummary ?? '') +
+    (p.url ? `<br><a class="modal-url" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a>` : '')
   document.getElementById('modalCols').innerHTML    = modalCols(p)
   document.getElementById('overlay').classList.add('open')
 }
@@ -546,7 +607,31 @@ function modalCols(p) {
   const grid = `<div class="modal-cols-grid">${cols.map(c => `<div>${c}</div>`).join('')}</div>`
   const manual = p.tasks?.manualTasks
   const manualHtml = manual?.length ? `<div class="modal-manual">${manualTasksSection(manual)}</div>` : ''
-  return manualHtml + grid
+  const logHtml = p.log?.entries.length ? `<div class="modal-manual">${logSection(p.log)}</div>` : ''
+  return complianceSection(p.compliance) + manualHtml + logHtml + grid
+}
+
+function complianceSection({ version, missing, warnings }) {
+  if (!missing.length && !warnings.length) return ''
+  const rows = [
+    ...missing.map(m => `<div class="compliance-row missing"><span class="task-icon">✕</span><span>${esc(m)}</span></div>`),
+    ...warnings.map(w => `<div class="compliance-row warning"><span class="task-icon">~</span><span>${esc(w)}</span></div>`),
+  ].join('')
+  const label = version === 'v2' ? 'Contrato v2 — avisos' : `Migração v2 — faltam ${missing.length}`
+  return `<div class="modal-compliance"><div class="section-title" style="color:var(--yellow)">${label}</div>${rows}</div>`
+}
+
+function logSection({ entries, total }) {
+  const field = (label, items, cls = '') => items.length
+    ? `<div class="log-field ${cls}"><b>${label}:</b> ${items.map(esc).join(' · ')}</div>` : ''
+  const html = entries.slice(0, 3).map(e => `
+    <div class="log-entry">
+      <div class="log-head"><span class="log-date">${e.date}</span><span class="log-title">${esc(e.title)}</span></div>
+      ${field('Feito', e.feito)}
+      ${field('Próximo', e.proximo)}
+      ${field('Bloqueios', e.bloqueios, 'blocked')}
+    </div>`).join('')
+  return `<div class="section-title">Log <span class="manual-task-count">${total} entradas</span></div>${html}`
 }
 
 function tasksSection({ sections, counts }) {
@@ -561,9 +646,10 @@ function tasksSection({ sections, counts }) {
     return `<div class="task-group">
       <div class="task-group-label">${label}</div>
       ${items.map(t => `
-        <div class="task-row ${t.status === 'done' ? 'done' : t.status === 'in_progress' ? 'wip' : ''}">
-          <span class="task-icon">${t.status === 'done' ? '✓' : t.status === 'in_progress' ? '◐' : '○'}</span>
-          <span>${esc(t.title)}</span>
+        <div class="task-row ${TASK_CLASS[t.status]}">
+          <span class="task-icon">${TASK_ICON[t.status]}</span>
+          <span>${esc(t.title)}${t.doneAt ? `<span class="task-date">${t.doneAt}</span>` : ''}
+            ${t.status === 'blocked' && t.criterion ? `<span class="task-reason">${esc(t.criterion)}</span>` : ''}</span>
         </div>`).join('')}
     </div>`
   }).join('')
@@ -599,6 +685,9 @@ function gitSection(git) {
   const meta = `<div class="git-meta">
     <span class="badge badge-branch">${esc(git.currentBranch)}</span>
     ${git.uncommittedChanges ? `<span class="badge badge-dirty">${git.uncommittedChanges} uncommitted</span>` : ''}
+    ${git.ahead ? `<span class="badge badge-ahead">↑${git.ahead} por push</span>` : ''}
+    ${git.behind ? `<span class="badge badge-warn">↓${git.behind} atrás</span>` : ''}
+    ${git.recentCommits.length && !git.tracking ? '<span class="badge badge-warn">sem remote</span>' : ''}
   </div>`
   const commits = git.recentCommits.map(c => `
     <div class="commit-row">
@@ -626,7 +715,9 @@ function age(iso) {
   return `${Math.floor(s/86400)}d`
 }
 function fmt(iso) { return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }
-function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+const TASK_CLASS = { done: 'done', in_progress: 'wip', blocked: 'blocked', todo: '' }
+const TASK_ICON  = { done: '✓', in_progress: '◐', blocked: '!', todo: '○' }
 
 document.getElementById('btnRefresh').addEventListener('click', () => load())
 document.getElementById('btnClose').addEventListener('click', closeModal)

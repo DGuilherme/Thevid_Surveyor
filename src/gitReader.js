@@ -23,5 +23,8 @@ export async function readGitData(projectPath) {
     lastCommit: recentCommits[0] ?? null,
     recentCommits,
     uncommittedChanges: status?.files?.length ?? 0,
+    tracking: status?.tracking ?? null,
+    ahead: status?.ahead ?? 0,
+    behind: status?.behind ?? 0,
   }
 }

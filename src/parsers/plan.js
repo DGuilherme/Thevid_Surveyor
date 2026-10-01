@@ -1,8 +1,21 @@
+const STATUS = { x: 'done', '~': 'in_progress', '!': 'blocked', ' ': 'todo' }
+
 export function parsePlan(content) {
   const phases = []
   let current = null
+  let phase = null
+  let url = null
+  let deploy = null
 
-  for (const line of content.split('\n')) {
+  for (const line of content.split(/\r?\n/)) {
+    if (!current) {
+      const faseMatch = line.match(/^>\s*Fase:\s*(.+)/i)
+      if (faseMatch && !phase) { phase = faseMatch[1].trim().toLowerCase(); continue }
+      const urlMatch = line.match(/^>\s*URL:\s*(https?:\/\/\S+)/i)
+      if (urlMatch && !url) { url = urlMatch[1]; continue }
+      const deployMatch = line.match(/^>\s*Deploy:\s*(\S+)/i)
+      if (deployMatch && !deploy) { deploy = deployMatch[1].toLowerCase(); continue }
+    }
     const phaseMatch = line.match(/^##\s+(.+)/)
     if (phaseMatch) {
       if (current) phases.push(current)
@@ -10,25 +23,21 @@ export function parsePlan(content) {
       continue
     }
     if (current) {
-      const stepMatch = line.match(/^- \[( |x|~)\]\s+(.+)/)
+      const stepMatch = line.match(/^- \[( |x|~|!)\]\s+(.+)/)
       if (stepMatch) {
-        const s = stepMatch[1]
-        current.steps.push({
-          title: stepMatch[2].trim(),
-          status: s === 'x' ? 'done' : s === '~' ? 'in_progress' : 'todo',
-        })
+        current.steps.push({ title: stepMatch[2].trim(), status: STATUS[stepMatch[1]] })
       }
     }
   }
   if (current) phases.push(current)
 
-  for (const phase of phases) {
-    const total = phase.steps.length
-    const done = phase.steps.filter(s => s.status === 'done').length
-    const hasWip = phase.steps.some(s => s.status === 'in_progress')
-    phase.status = total === 0 ? 'todo' : done === total ? 'done' : hasWip || done > 0 ? 'in_progress' : 'todo'
-    phase.completion = total > 0 ? Math.round((done / total) * 100) : 0
+  for (const p of phases) {
+    const total = p.steps.length
+    const done = p.steps.filter(s => s.status === 'done').length
+    const hasWip = p.steps.some(s => s.status === 'in_progress' || s.status === 'blocked')
+    p.status = total === 0 ? 'todo' : done === total ? 'done' : hasWip || done > 0 ? 'in_progress' : 'todo'
+    p.completion = total > 0 ? Math.round((done / total) * 100) : 0
   }
 
-  return { phases }
+  return { phase, url, deploy, phases }
 }

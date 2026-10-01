@@ -12,16 +12,19 @@ Uma frase sobre o que o projeto faz.
 | `SPEC.md` | O que o projeto faz e o que está fora de scope. **Imutável sem decisão explícita.** |
 | `PLAN.md` | Fases do roadmap com checkboxes (`[x]` done, `[~]` in progress, `[ ]` todo) |
 | `TASKS.md` | Tarefas em formato MoSCoW com critério de done por tarefa |
+| `LOG.md` | Report de trabalho — uma entrada por sessão, mais recente no topo |
 | `CLAUDE.md` | Este ficheiro |
+
+Este projeto é supervisionado pelo **Thevid Surveyor** (dashboard local que lê estes ficheiros). Manter os formatos exatos dos templates — cabeçalhos `## Must Have` etc., checkboxes `[x] [~] [ ] [!]`, `> Fase:` no PLAN, `## YYYY-MM-DD — título` no LOG — senão o estado do projeto fica errado no dashboard.
 
 ---
 
 ## Regras do Agente
 
-1. **Lê sempre `SPEC.md` e `TASKS.md`** antes de começar qualquer feature.
+1. **Lê sempre `SPEC.md`, `TASKS.md` e a última entrada de `LOG.md`** antes de começar qualquer trabalho.
 2. **Usa Plan Mode** antes de qualquer mudança que toque mais de 2 ficheiros.
 3. **Não implementas nada que não esteja em `SPEC.md`** — se for necessário, atualiza o spec primeiro e aguarda confirmação.
-4. **Quando uma task fica completa**, atualiza o `[~]` ou `[ ]` para `[x]` em `TASKS.md` (e em `PLAN.md` se a fase ficar concluída).
+4. **Quando uma task fica completa**, atualiza para `[x]` com a data no fim — `- [x] Título (YYYY-MM-DD)` — em `TASKS.md` (e em `PLAN.md` se o passo/fase ficar concluído). Se ficar bloqueada, usa `[!]` e escreve a razão na linha `>`.
 5. **Corre os testes antes de marcar uma task como done.**
 6. **Não criar ficheiros `.md` ou `README` sem pedido explícito.**
 7. **Não adicionar comentários de código** — só quando o WHY é não-óbvio (constraint oculta, workaround de bug específico). Nunca comentar o WHAT.
@@ -58,6 +61,43 @@ Nunca corrigir silenciosamente sem identificar em qual dos três casos estás.
 
 ---
 
+## Report de Trabalho
+
+No fim de cada sessão em que houve alterações (antes do commit final):
+
+1. Acrescentar uma entrada **no topo** de `LOG.md`:
+   ```
+   ## YYYY-MM-DD — título curto
+
+   **Feito:**
+   - ...
+
+   **Próximo:**
+   - ...
+
+   **Bloqueios:**
+   - ... (ou "—")
+   ```
+2. Confirmar que `TASKS.md` reflete o estado real (`[x]` com data, `[~]`, `[!]`).
+3. Atualizar `> Fase:` (e `> URL:` se houve deploy) no topo de `PLAN.md` se mudou.
+4. Commit destes ficheiros juntamente com o código — o estado tem de estar no git.
+
+Nunca marcar como feito o que não foi verificado. Report honesto > report bonito.
+
+---
+
+## Conhecimento do Projeto
+
+Todo o conhecimento sobre o projeto vive **dentro do repositório**, nunca só na memória do agente (a memória do utilizador fica fora do projeto e perde-se ao mudar de PC ou de pasta):
+
+- Convenções, gotchas, comandos → secção `## Convenções` deste ficheiro
+- Decisões técnicas e porquê → tabela `## Decisões técnicas` do `SPEC.md`
+- Estado e histórico → `TASKS.md`, `PLAN.md`, `LOG.md`
+
+Se aprenderes algo que valha guardar, escreve-o num destes ficheiros.
+
+---
+
 ## Tarefas Manuais
 
 Quando identificares uma ação que não podes executar (deploy em produção, configurar env vars no Coolify/Vercel, aplicar migrações em servidor remoto, criar buckets de storage, configurar DNS, etc.), **não mencionar apenas no chat**. Registar em `TASKS.md` na secção `## Tarefas Manuais` com descrição clara do que fazer e onde.
@@ -79,17 +119,37 @@ npm run build
 
 ---
 
-## Deployment
+## Deployment (Homelab — Coolify)
 
 | Ambiente | Plataforma | URL |
 |----------|-----------|-----|
-| Produção | Vercel / Coolify / localhost | https://TODO |
+| Produção | Coolify (homelab) | https://nomeprojeto.theviddev.org |
 
-```bash
-# Como fazer deploy
-# ex: push para main → auto-deploy no Coolify
-# ex: vercel --prod
-```
+Deploy automático por webhook a cada `git push` para `main`.
+
+**Infraestrutura:**
+- Painel: https://coolify.theviddev.org · SSH: `ssh nuno@ssh.theviddev.org`
+- Proxy Traefik na porta 80 partilhado; SSL tratado pelo Cloudflare (túnel `homelab`)
+- Domínio no Coolify usa **sempre `http://`** (ex: `http://nomeprojeto.theviddev.org`)
+- PostgreSQL partilhado, contentor `nbo4l6g9n630qrygbe404uao`, uma database por projeto:
+  `postgresql://postgres:PASSWORD@nbo4l6g9n630qrygbe404uao:5432/NOME_DB`
+
+**Regras obrigatórias:**
+- `Dockerfile` multi-stage, otimizado para produção, **na raiz**; porta exposta = porta no Coolify
+- `.env.example` com todas as variáveis, sem valores; nunca credenciais no código
+- Migração SQL completa e pronta a correr em `migrations/` (se usar PostgreSQL)
+- `SESSION_SECRET` com mínimo 32 caracteres (`openssl rand -base64 32`)
+
+**Passos de deploy** (registar em `## Tarefas Manuais` os que o utilizador tem de fazer):
+1. Cloudflare: rota `nomeprojeto.theviddev.org` → `localhost:80` (HTTP)
+2. Coolify: New Resource → Private Repository (Deploy Key) → Build Pack Docker → porta
+3. Coolify: domínio `http://nomeprojeto.theviddev.org` + variáveis de ambiente
+4. Servidor: criar database e correr migrations (`sudo docker exec -it nbo4l6g9n630qrygbe404uao psql -U postgres`)
+5. Coolify: Deploy → aguardar "Rolling update completed" → testar https
+
+**Erros comuns:** 502 → porta Dockerfile ≠ Coolify · Too many redirects → `https://` no domínio do Coolify · 404 → redeploy · crash no arranque → falta env var · falha na exportação → Deploy outra vez.
+
+Se o projeto não for para o homelab (ex: só local), substituir esta secção pela forma real de correr/deploy.
 
 ---
 
@@ -105,4 +165,6 @@ npm run build
 
 - Não implementar features fora de `SPEC.md` sem atualizar o spec primeiro.
 - Não marcar tasks como done sem ter corrido os testes.
+- Não terminar uma sessão com alterações sem entrada no `LOG.md`.
+- Não guardar conhecimento do projeto só na memória do agente.
 - [Adicionar restrições específicas do projeto]

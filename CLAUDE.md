@@ -1,15 +1,12 @@
 # Thevid Surveyor — Claude Instructions
 
 ## Project summary
-Local read-only dashboard that scans projects in E:\projects\ and shows their status via a React frontend + Node.js backend.
+Local read-only dashboard that scans projects in E:\projects\ and shows their real status (contract v2 compliance, tasks, plan, LOG, git, deploy readiness). Single Node.js/Express server serving a static frontend.
 
 ## How to run
 ```bash
-# Backend (port 3001)
-cd backend && npm install && npm run dev
-
-# Frontend (port 5173)
-cd frontend && npm install && npm run dev
+npm install
+npm run dev   # http://localhost:3000
 ```
 
 ## Adicionar Funcionalidades
@@ -40,6 +37,14 @@ Nunca corrigir silenciosamente sem identificar em qual dos três casos estás.
 
 ---
 
+## Report de Trabalho
+
+No fim de cada sessão com alterações: entrada no topo de `LOG.md` (`## YYYY-MM-DD — título` + Feito / Próximo / Bloqueios), `TASKS.md` com `[x]` + data, `> Fase:` do `PLAN.md` atualizada, e commit de tudo.
+
+## Conhecimento do Projeto
+
+Convenções e gotchas ficam neste ficheiro; decisões no `SPEC.md`. Nunca só na memória do agente.
+
 ## Tarefas Manuais
 
 Quando identificares uma ação que não podes executar (arrancar os servidores localmente, instalar dependências, etc.), **não mencionar apenas no chat**. Registar em `TASKS.md` na secção `## Tarefas Manuais` com descrição clara do que fazer.
@@ -49,25 +54,23 @@ Quando identificares uma ação que não podes executar (arrancar os servidores 
 Este projeto corre localmente apenas (localhost). Não há deployment em servidor.
 
 ```bash
-# Backend: http://localhost:3001
-# Frontend: http://localhost:5173
+# http://localhost:3000
 ```
 
 ## Architecture
-- `backend/src/index.js` — Express server, entry point
-- `backend/src/projectScanner.js` — discovers and aggregates project data
-- `backend/src/gitReader.js` — git data via simple-git
-- `backend/src/parsers/tasks.js` — TASKS.md parser
-- `backend/src/parsers/plan.js` — PLAN.md parser
-- `frontend/src/App.jsx` — main app with polling
-- `frontend/src/components/ProjectCard.jsx` — card per project
-- `frontend/src/components/ProjectDetail.jsx` — detail overlay
-- `templates/` — contract file templates for new projects
+- `src/server.js` — Express server, entry point, PROJECTS_ROOT, serves `public/`
+- `src/projectScanner.js` — discovers every project folder, compliance, activity, deploy readiness
+- `src/gitReader.js` — git data via simple-git (branch, commits, uncommitted, ahead/behind from local refs)
+- `src/parsers/tasks.js` — TASKS.md parser (MoSCoW, `[x] [~] [ ] [!]`, dates, criteria)
+- `src/parsers/plan.js` — PLAN.md parser (`> Fase:` / `> URL:` header + phases)
+- `src/parsers/log.js` — LOG.md parser (entries Feito / Próximo / Bloqueios)
+- `public/index.html` — dashboard (vanilla JS, polling 30s)
+- `templates/` — contract v2 templates + `PROMPTS.md` (claude.ai instructions, migration prompt)
 
 ## Rules
 - Read SPEC.md before any feature change
 - Backend is read-only — never write to project files
-- PROJECTS_ROOT is hardcoded in backend/src/index.js — do not make it dynamic without updating SPEC
+- PROJECTS_ROOT is hardcoded in src/server.js — do not make it dynamic without updating SPEC
 - Parsers must be pure functions — no side effects
 
 ## Do not
