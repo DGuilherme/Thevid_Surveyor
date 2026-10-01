@@ -15,6 +15,8 @@
   > Edit a TASKS.md file → dashboard reflects change within 30s
 
 ## Should Have
+- [x] Manual tasks section per project in the detail panel
+  > Parse `## Tarefas Manuais` from each project's TASKS.md and show separately in the modal (not counted in completion %)
 - [ ] Project detail panel with full task list and plan breakdown
   > Click card → overlay with all tasks by section and plan phases
 - [ ] Filter by active / incomplete
@@ -28,3 +30,11 @@
 - Write/edit tasks from UI — keep read-only, edit in editor
 - GitHub API integration — local only
 - Dark/light theme toggle — dark only
+
+---
+
+## Tarefas Manuais
+
+Ações que requerem o utilizador — o agente não pode executar estas, só registá-las.
+
+- [ ] Correr backend (`npm run dev` em `backend/`) e frontend (`npm run dev` em `frontend/`) antes de usar o dashboard

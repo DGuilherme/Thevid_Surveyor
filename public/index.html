@@ -332,8 +332,11 @@
   .btn-close:hover { border-color: var(--red); color: var(--red); }
   .modal-spec { font-size: 15px; color: var(--muted); margin-bottom: 28px; padding-left: 2px; font-style: italic; }
 
-  .modal-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-  @media (max-width: 620px) { .modal-cols { grid-template-columns: 1fr; } }
+  .modal-cols { display: flex; flex-direction: column; gap: 28px; }
+  .modal-cols-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 620px) { .modal-cols-grid { grid-template-columns: 1fr; } }
+  .modal-manual { border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  .manual-tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 4px 32px; }
 
   .section-title {
     font-size: 13px; font-weight: 700;
@@ -346,7 +349,7 @@
 
   .task-group { margin-bottom: 16px; }
   .task-group-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-  .task-row { display: flex; gap: 10px; font-size: 14px; padding: 4px 0; align-items: baseline; color: var(--text); }
+  .task-row { display: flex; gap: 10px; font-size: 14px; padding: 6px 0; align-items: baseline; color: var(--text); }
   .task-row.done { color: var(--muted); text-decoration: line-through; }
   .task-row.wip  { color: var(--yellow); }
   .task-icon { flex-shrink: 0; font-size: 11px; font-family: Consolas, 'Courier New', monospace; }
@@ -367,6 +370,10 @@
   .commit-row { display: flex; gap: 10px; font-size: 13px; align-items: baseline; min-width: 0; font-family: Consolas, 'Courier New', monospace; }
   .commit-row .commit-msg { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); opacity: .8; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
   .commit-row .commit-age { color: var(--muted); flex-shrink: 0; }
+
+  .manual-task-row { display: flex; gap: 10px; font-size: 16px; padding: 7px 0; align-items: baseline; color: var(--orange); }
+  .manual-task-row.done { color: var(--muted); text-decoration: line-through; }
+  .manual-task-count { font-size: 10px; opacity: .5; }
 </style>
 </head>
 <body>
@@ -536,7 +543,10 @@ function modalCols(p) {
   if (p.tasks) cols.push(tasksSection(p.tasks))
   if (p.plan)  cols.push(planSection(p.plan))
   if (p.git)   cols.push(gitSection(p.git))
-  return cols.map(c => `<div>${c}</div>`).join('')
+  const grid = `<div class="modal-cols-grid">${cols.map(c => `<div>${c}</div>`).join('')}</div>`
+  const manual = p.tasks?.manualTasks
+  const manualHtml = manual?.length ? `<div class="modal-manual">${manualTasksSection(manual)}</div>` : ''
+  return manualHtml + grid
 }
 
 function tasksSection({ sections, counts }) {
@@ -558,6 +568,17 @@ function tasksSection({ sections, counts }) {
     </div>`
   }).join('')
   return `<div class="section-title">Tasks <span style="opacity:.5;font-size:10px">${counts.done}/${counts.total}</span></div>${html}`
+}
+
+function manualTasksSection(tasks) {
+  const pending = tasks.filter(t => t.status !== 'done').length
+  const html = tasks.map(t => `
+    <div class="manual-task-row ${t.status === 'done' ? 'done' : ''}">
+      <span class="task-icon">${t.status === 'done' ? '✓' : '!'}</span>
+      <span>${esc(t.title)}</span>
+    </div>`).join('')
+  return `<div class="section-title" style="color:var(--orange)">Manual Tasks <span class="manual-task-count">${pending} pending</span></div>
+    <div class="manual-tasks-grid">${html}</div>`
 }
 
 function planSection({ phases }) {

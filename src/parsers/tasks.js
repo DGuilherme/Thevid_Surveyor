@@ -1,11 +1,13 @@
 export function parseTasks(content) {
-  const sections = { mustHave: [], shouldHave: [], couldHave: [], wontHave: [] }
+  const sections = { mustHave: [], shouldHave: [], couldHave: [], wontHave: [], manualTasks: [] }
   const sectionMap = {
     'must have': 'mustHave',
     'should have': 'shouldHave',
     'could have': 'couldHave',
     "won't have": 'wontHave',
     'wont have': 'wontHave',
+    'tarefas manuais': 'manualTasks',
+    'manual tasks': 'manualTasks',
   }
 
   let currentSection = 'mustHave'
@@ -14,7 +16,7 @@ export function parseTasks(content) {
     const sectionMatch = line.match(/^##\s+(.+)/)
     if (sectionMatch) {
       const key = sectionMatch[1].toLowerCase().replace(/\s*\(.*\)/, '').trim()
-      currentSection = sectionMap[key] ?? 'mustHave'
+      currentSection = sectionMap[key] ?? currentSection
       continue
     }
     const taskMatch = line.match(/^- \[( |x|~)\]\s+(.+)/)
@@ -35,6 +37,7 @@ export function parseTasks(content) {
 
   return {
     sections,
+    manualTasks: sections.manualTasks,
     counts: { done, inProgress, todo: all.length - done - inProgress, total: all.length },
     completion: mustTotal > 0 ? Math.round((mustDone / mustTotal) * 100) : 0,
   }
