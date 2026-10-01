@@ -62,5 +62,5 @@
 Ações que requerem o utilizador — o agente não pode executar estas, só registá-las.
 
 - [ ] Correr o servidor (`npm run dev` na raiz) e abrir http://localhost:3000 antes de usar o dashboard
-- [ ] Colar o bloco "Instruções do projeto claude.ai" de `templates/PROMPTS.md` nas instruções do projeto no Claude do browser
+- [x] Colar a secção "Thevid Surveyor" de `templates/PROMPTS.md` nas instruções do projeto no Claude do browser (2026-10-01)
 - [ ] Migrar cada projeto para v2 (abrir Claude Code no projeto e usar o prompt "Migrar para contrato v2")
