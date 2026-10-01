@@ -140,12 +140,25 @@ Deploy automático por webhook a cada `git push` para `main`.
 - Migração SQL completa e pronta a correr em `migrations/` (se usar PostgreSQL)
 - `SESSION_SECRET` com mínimo 32 caracteres (`openssl rand -base64 32`)
 
-**Passos de deploy** (registar em `## Tarefas Manuais` os que o utilizador tem de fazer):
-1. Cloudflare: rota `nomeprojeto.theviddev.org` → `localhost:80` (HTTP)
-2. Coolify: New Resource → Private Repository (Deploy Key) → Build Pack Docker → porta
-3. Coolify: domínio `http://nomeprojeto.theviddev.org` + variáveis de ambiente
-4. Servidor: criar database e correr migrations (`sudo docker exec -it nbo4l6g9n630qrygbe404uao psql -U postgres`)
-5. Coolify: Deploy → aguardar "Rolling update completed" → testar https
+**Cloudflare** (feito raramente — seguir à letra):
+- Túnel: `homelab` em Cloudflare Zero Trust → Networks → Connector → homelab
+- Todas as rotas apontam para `localhost:80`
+- Nova rota para o projeto:
+  - Subdomain: `nomeprojeto`
+  - Domain: `theviddev.org`
+  - Path: (vazio)
+  - Type: `HTTP`
+  - URL: `localhost:80`
+- Fica público em `https://nomeprojeto.theviddev.org`
+
+**Passos de deploy** (registar em `## Tarefas Manuais` os que o utilizador tem de fazer, com estes detalhes):
+1. Cloudflare: criar a rota acima (`nomeprojeto.theviddev.org` → `localhost:80`)
+2. Coolify: New Resource → Private Repository (with Deploy Key) → Build Pack Docker → porta correta
+3. Coolify: definir domínio como `http://nomeprojeto.theviddev.org`
+4. Coolify: adicionar todas as variáveis de ambiente
+5. Servidor: criar database e correr migrations (`sudo docker exec -it nbo4l6g9n630qrygbe404uao psql -U postgres`); PASSWORD em Coolify → recurso PostgreSQL → Configuration → Password
+6. Coolify: clicar Deploy e aguardar "Rolling update completed"
+7. Testar em `https://nomeprojeto.theviddev.org`
 
 **Erros comuns:** 502 → porta Dockerfile ≠ Coolify · Too many redirects → `https://` no domínio do Coolify · 404 → redeploy · crash no arranque → falta env var · falha na exportação → Deploy outra vez.
 

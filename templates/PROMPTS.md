@@ -14,51 +14,70 @@ Blocos prontos a copiar. Os templates do contrato v2 estão em `E:\projects\Thev
 
 ## Instruções do projeto claude.ai
 
-> Substitui as instruções atuais do projeto no Claude do browser. Inclui o homelab + o contrato do Surveyor.
+> Substitui as instruções atuais do projeto no Claude do browser. É o texto original do homelab, sem alterações, com a secção "Thevid Surveyor" acrescentada no fim. Se preferires, cola só essa secção a seguir ao que já lá tens.
 
 ```
-O objetivo deste projeto é planear novas apps que já nascem preparadas para correr no meu
-home lab e para serem supervisionadas pelo Thevid Surveyor.
+O objetivo deste projeto é fazer com que todos os projetos ou apps tenham ja em mente esta parte onde vai ficar a executar ou pelo menos considerar. 
 
-# Servidor Home Lab — Infraestrutura
+# Servidor Home Lab — Infraestrutura Completa
 
 ## Servidor
-- Fujitsu PRIMERGY TX1310 M1 · Ubuntu Server 24.04 LTS · 10GB RAM
-- SSH: ssh nuno@ssh.theviddev.org · Painel: https://coolify.theviddev.org
+- Hardware: Fujitsu PRIMERGY TX1310 M1
+- OS: Ubuntu Server 24.04 LTS
+- RAM: 10GB
+- SSH remoto: ssh nuno@ssh.theviddev.org
+- Acesso ao painel: https://coolify.theviddev.org
 
 ## Coolify
-- Deploy self-hosted (substituto do Vercel), proxy Traefik na porta 80 partilhado
-- Build Pack Docker — Dockerfile obrigatório na raiz
-- Domínios no Coolify usam sempre http:// (o Cloudflare trata do SSL)
-- Deploy via GitHub (Deploy Key) e automático por webhook a cada push para main
+- Plataforma de deploy self-hosted (substituto do Vercel)
+- Proxy Traefik na porta 80 — partilhado por todas as apps
+- Build Pack: Docker — obrigatório Dockerfile na raiz de cada projeto
+- Domínios internos usam sempre http:// — nunca https:// (o Cloudflare trata do SSL)
+- Deploy via GitHub com Deploy Key já configurada no Coolify
+- Deploy automático por webhook a cada git push para main
 
 ## Cloudflare
-- Domínio theviddev.org, túnel "homelab", todas as rotas → localhost:80
-- Rota por projeto: Subdomain nomeprojeto · Domain theviddev.org · Type HTTP · URL localhost:80
-- App pública em https://nomeprojeto.theviddev.org
+- Domínio base: theviddev.org
+- Túnel: homelab (Cloudflare Zero Trust → Networks → Connector → homelab)
+- Todas as rotas apontam para localhost:80
+- Para cada novo projeto criar uma rota:
+  - Subdomain: nomeprojeto
+  - Domain: theviddev.org
+  - Path: (vazio)
+  - Type: HTTP
+  - URL: localhost:80
+- O projeto fica acessível publicamente em https://nomeprojeto.theviddev.org
 
-## PostgreSQL
-- Contentor nbo4l6g9n630qrygbe404uao, uma database por projeto
-- postgresql://postgres:PASSWORD@nbo4l6g9n630qrygbe404uao:5432/NOME_DB
-- Password no Coolify → recurso PostgreSQL → Configuration
-- Migrations: sudo docker exec -it nbo4l6g9n630qrygbe404uao psql -U postgres
+## Base de dados PostgreSQL
+- Contentor: nbo4l6g9n630qrygbe404uao
+- Cada projeto tem a sua própria database no mesmo servidor PostgreSQL
+- Connection string: postgresql://postgres:PASSWORD@nbo4l6g9n630qrygbe404uao:5432/NOME_DB
+- A PASSWORD está disponível no Coolify → recurso PostgreSQL → Configuration → campo Password
+- Migrations correm via: sudo docker exec -it nbo4l6g9n630qrygbe404uao psql -U postgres
 
 ## Regras para novos projetos
-- Dockerfile multi-stage otimizado para produção na raiz
-- Migração SQL completa em migrations/
-- .env.example com todas as variáveis sem valores; nunca credenciais no código
-- SESSION_SECRET ≥ 32 caracteres (openssl rand -base64 32)
+- Criar Dockerfile otimizado para produção na raiz (multi-stage build)
+- Criar ficheiro de migração SQL completo e pronto a correr
+- Criar .env.example com todas as variáveis necessárias sem valores
+- Nunca expor credenciais no código — usar sempre variáveis de ambiente
+- Variáveis de ambiente são configuradas no painel do Coolify
+- SESSION_SECRET mínimo 32 caracteres — gerar com: openssl rand -base64 32
 
-## Passos de deploy
-1. Cloudflare: rota nomeprojeto.theviddev.org → localhost:80
-2. Coolify: New Resource → Private Repository (Deploy Key) → Build Pack Docker → porta
-3. Coolify: domínio http://nomeprojeto.theviddev.org + variáveis de ambiente
-4. Servidor: criar database e correr migrations
-5. Coolify: Deploy → "Rolling update completed" → testar https
+## Passos de deploy para cada novo projeto
+1. Cloudflare: criar rota nomeprojeto.theviddev.org → localhost:80
+2. Coolify: New Resource → Private Repository (with Deploy Key) → Build Pack Docker → porta correta
+3. Coolify: definir domínio como http://nomeprojeto.theviddev.org
+4. Coolify: adicionar todas as variáveis de ambiente
+5. Servidor: criar database e correr migrations via docker exec
+6. Coolify: clicar Deploy e aguardar Rolling update completed
+7. Testar em https://nomeprojeto.theviddev.org
 
 ## Erros comuns
-- 502 → porta do Dockerfile ≠ Coolify · Too many redirects → https:// no domínio do Coolify
-- 404 → redeploy · crash ao iniciar → falta env var · falha na exportação → Deploy outra vez
+- 502 Bad Gateway → porta no Dockerfile não coincide com a do Coolify
+- Too many redirects → domínio no Coolify tem https:// em vez de http://
+- 404 page not found → fazer redeploy para o proxy registar a rota
+- App crasha ao iniciar → falta variável de ambiente (ver logs no Coolify)
+- Deploy falha na exportação → tentar Deploy novamente
 
 # Thevid Surveyor — Contrato de projeto (v2)
 

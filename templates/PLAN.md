@@ -27,7 +27,7 @@
 ## Fase 3 — Produção (homelab)
 
 - [ ] Dockerfile multi-stage na raiz + `.env.example` completo
-- [ ] Cloudflare: rota `nomeprojeto.theviddev.org` → `localhost:80`
+- [ ] Cloudflare (Zero Trust → Networks → Connector → homelab): rota Subdomain `nomeprojeto` · Domain `theviddev.org` · Path vazio · Type HTTP · URL `localhost:80`
 - [ ] Coolify: recurso (Private Repo + Deploy Key, Build Pack Docker, porta certa, domínio `http://`)
 - [ ] Coolify: variáveis de ambiente configuradas
 - [ ] PostgreSQL: database criada e migrations aplicadas
