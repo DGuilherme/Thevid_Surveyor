@@ -13,6 +13,7 @@
 - Dashboard: badges de fase/STALE/↑push/DEPLOY/LOG, modal com Migração v2 + Log, filtros Stale/Não conformes
 - PROMPTS.md: instruções para o projeto claude.ai e prompt "Migrar para contrato v2"
 - CLAUDE.md corrigido (src/ + public/, porta 3000); .gitignore deixa versionar `.claude/settings.json`
+- Critério de done obrigatório só em tasks abertas; tasks [x] antigas sem critério passam a aviso
 
 **Próximo:**
 - Migrar os projetos supervisionados para v2 (começar pelos que já têm contrato v1)

@@ -19,7 +19,7 @@ Every supervised project must have, in its root and versioned in git:
   - `> Fase: ideia | dev | mvp | produção | pausado`
   - `> URL: https://nome.theviddev.org` (when deployed)
   - `> Deploy: local` (optional — local-only projects skip the deploy files check)
-- `TASKS.md` — MoSCoW checkboxes with a `>` done criterion per task
+- `TASKS.md` — MoSCoW checkboxes with a `>` done criterion per task (required for open tasks; legacy done tasks without one are only a warning)
   - States: `[x]` done · `[~]` in progress · `[ ]` todo · `[!]` blocked
   - Done tasks carry the completion date: `- [x] Título (2026-10-01)`
 - `CLAUDE.md` — agent rules, including the reporting and knowledge rules below

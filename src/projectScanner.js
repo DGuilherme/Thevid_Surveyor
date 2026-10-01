@@ -27,7 +27,7 @@ function buildCompliance({ files, plan, tasks, deploy }) {
   }
   if (files['PLAN.md'] && !plan?.phase) missing.push('PLAN.md sem cabeçalho "> Fase:"')
   if (files['CLAUDE.md'] && !/LOG\.md/.test(files['CLAUDE.md'])) missing.push('CLAUDE.md sem regras v2 (report no LOG.md)')
-  if (tasks?.counts.missingCriteria) missing.push(`${tasks.counts.missingCriteria} task(s) sem critério de done ">"`)
+  if (tasks?.counts.missingCriteria) missing.push(`${tasks.counts.missingCriteria} task(s) abertas sem critério de done ">"`)
 
   const deployMissing = [
     !deploy.dockerfile && 'Dockerfile',
@@ -38,6 +38,7 @@ function buildCompliance({ files, plan, tasks, deploy }) {
     if (DEPLOY_PHASES.includes(plan?.phase)) missing.push(msg)
     else warnings.push(msg)
   }
+  if (tasks?.counts.doneWithoutCriteria) warnings.push(`${tasks.counts.doneWithoutCriteria} task(s) [x] sem critério`)
   if (tasks?.counts.doneWithoutDate) warnings.push(`${tasks.counts.doneWithoutDate} task(s) [x] sem data`)
 
   const hasAny = Object.values(files).some(Boolean)
