@@ -24,6 +24,7 @@
 - [x] Filters (all / active / incomplete)
 
 ## Phase 4: Polish
+- [x] Readable detail panel (summary strip, "Agora" block, tabs, folded done items)
 - [ ] Test with real projects (add contract files to existing repos)
 - [ ] Tune parsing edge cases
 - [ ] Add CLAUDE.md to key projects

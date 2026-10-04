@@ -67,6 +67,13 @@ Este projeto corre localmente apenas (localhost). Não há deployment em servido
 - `public/index.html` — dashboard (vanilla JS, polling 30s)
 - `templates/` — contract v2 templates + `PROMPTS.md` (claude.ai instructions, migration prompt)
 
+## UI conventions
+Validated by the user on 2026-10-04 (detail panel redesign):
+- Detail panel order: summary strip (KPIs) → "Agora" block (blocked, in progress, latest LOG "Próximo", pending manual tasks) → tabs (Tasks, Plano, Manuais, Log, Git, Contrato).
+- Show what needs attention first; fold what's finished (done tasks, closed phases, older LOG entries) inside `<details>`.
+- Open tasks sorted blocked → in progress → todo. Tabs show a count, coloured when something needs attention.
+- New detail info goes into an existing or new tab, never as another stacked section.
+
 ## Rules
 - Read SPEC.md before any feature change
 - Backend is read-only — never write to project files

@@ -11,9 +11,12 @@
 - Detalhe em separadores: Tasks, Plano, Manuais, Log, Git, Contrato (o separador escolhido mantém-se entre projetos)
 - Tasks concluídas, fases fechadas e entradas antigas do LOG ficam recolhidas; tasks abertas ordenadas bloqueada → em curso → por fazer
 
+- Layout validado pelo utilizador; convenções de UI guardadas em `CLAUDE.md`
+
 **Próximo:**
-- Feedback do utilizador sobre o novo layout
-- Could Have: ordenar e pesquisar projetos
+- Could Have: ordenar a grelha (completion, último commit, nome) e pesquisa por nome
+- Phase 4: afinar casos limite dos parsers (ex.: DavidRapLog mostra spec summary "..." e não tem `> Fase:`)
+- Phase 5: migrar os projetos supervisionados para v2
 
 **Bloqueios:**
 - Nenhum
