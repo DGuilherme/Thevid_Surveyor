@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-10-04 — Painel de detalhe mais legível
+
+**Feito:**
+- Modal reorganizado: faixa de resumo (fase, progresso, tasks, atividade, git, contrato) + bloco "Agora" (bloqueadas, em curso, próximo do último LOG, manuais pendentes)
+- Detalhe em separadores: Tasks, Plano, Manuais, Log, Git, Contrato (o separador escolhido mantém-se entre projetos)
+- Tasks concluídas, fases fechadas e entradas antigas do LOG ficam recolhidas; tasks abertas ordenadas bloqueada → em curso → por fazer
+
+**Próximo:**
+- Feedback do utilizador sobre o novo layout
+- Could Have: ordenar e pesquisar projetos
+
+**Bloqueios:**
+- Nenhum
+
 ## 2026-10-01 — Contrato v2 + estado real
 
 **Feito:**

@@ -38,6 +38,8 @@
   > Contains "migrar para contrato v2" prompt and a block for the claude.ai project instructions
 - [x] Fix CLAUDE.md architecture/how-to-run drift (2026-10-01)
   > CLAUDE.md describes `src/` + `public/`, single server on port 3000
+- [x] Detail panel legível: resumo no topo + separadores (2026-10-04)
+  > Modal abre com uma faixa de resumo (fase, progresso, tasks, atividade, git) e um bloco "Agora" (em progresso, bloqueadas, próximo passo do LOG); o detalhe fica em separadores (Tasks, Plano, Manuais, Log, Git, Contrato); tasks concluídas e fases fechadas ficam recolhidas por defeito
 
 ## Could Have
 - [ ] Sort by completion, last commit, name

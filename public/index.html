@@ -345,11 +345,6 @@
   .btn-close:hover { border-color: var(--red); color: var(--red); }
   .modal-spec { font-size: 15px; color: var(--muted); margin-bottom: 28px; padding-left: 2px; font-style: italic; }
 
-  .modal-cols { display: flex; flex-direction: column; gap: 28px; }
-  .modal-cols-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-  @media (max-width: 620px) { .modal-cols-grid { grid-template-columns: 1fr; } }
-  .modal-manual { border-bottom: 1px solid var(--border); padding-bottom: 24px; }
-  .manual-tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 4px 32px; }
 
   .section-title {
     font-size: 13px; font-weight: 700;
@@ -384,9 +379,8 @@
   .commit-row .commit-msg { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); opacity: .8; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
   .commit-row .commit-age { color: var(--muted); flex-shrink: 0; }
 
-  .manual-task-row { display: flex; gap: 10px; font-size: 16px; padding: 7px 0; align-items: baseline; color: var(--orange); }
+  .manual-task-row { display: flex; gap: 10px; font-size: 14px; padding: 6px 0; align-items: baseline; color: var(--orange); }
   .manual-task-row.done { color: var(--muted); text-decoration: line-through; }
-  .manual-task-count { font-size: 10px; opacity: .5; }
 
   .task-row.blocked { color: var(--red); }
   .task-reason { display: block; font-size: 12px; opacity: .75; }
@@ -406,6 +400,52 @@
   .log-field { color: var(--muted); padding-left: 2px; }
   .log-field b { color: var(--text); font-weight: 600; opacity: .8; }
   .log-field.blocked b { color: var(--red); }
+
+  /* ── Detail: summary strip ── */
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); padding: 10px 14px; min-width: 0; }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+  .kpi-value { font-size: 18px; font-weight: 600; font-family: Consolas, 'Courier New', monospace; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi .bar { margin: 6px 0 0; }
+  .kpi.alert { border-color: rgba(255,83,112,.4); }
+  .kpi.warn  { border-color: rgba(255,215,64,.35); }
+
+  /* ── Detail: "Agora" focus block ── */
+  .now { border-left: 2px solid var(--yellow); background: rgba(255,215,64,.03); padding: 12px 18px; margin-bottom: 22px; }
+  .now .section-title { margin-bottom: 8px; color: var(--yellow); }
+  .now-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 8px; }
+  .now-label:first-of-type { margin-top: 0; }
+  .now .task-row { padding: 3px 0; }
+  .now-link { background: none; border: none; color: var(--orange); font: inherit; font-size: 13px; cursor: pointer; padding: 6px 0 0; text-decoration: underline dotted; }
+
+  /* ── Detail: tabs ── */
+  .tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; color: var(--muted); padding: 8px 14px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; transition: color .15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+  .tab-count { font-family: Consolas, 'Courier New', monospace; font-size: 11px; opacity: .6; margin-left: 5px; }
+  .tab-count.alert { color: var(--red); opacity: 1; }
+  .tab-count.warn  { color: var(--yellow); opacity: 1; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .empty-note { color: var(--muted); font-size: 14px; padding: 6px 0; }
+
+  /* ── Detail: folds ── */
+  details.fold > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 4px 0; list-style: none; user-select: none; }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before { content: '▸'; display: inline-block; width: 16px; font-size: 11px; }
+  details.fold[open] > summary::before { content: '▾'; }
+  details.fold > summary:hover { color: var(--text); }
+  .task-crit { display: block; font-size: 12px; color: var(--muted); }
+
+  details.phase { margin-bottom: 10px; }
+  details.phase > summary { list-style: none; cursor: pointer; }
+  details.phase > summary::-webkit-details-marker { display: none; }
+  details.phase > summary .phase-header span:first-child::before { content: '▸ '; font-size: 11px; color: var(--muted); }
+  details.phase[open] > summary .phase-header span:first-child::before { content: '▾ '; }
+  .phase-steps { padding: 8px 0 4px 16px; }
+  .phase-steps .task-row { padding: 2px 0; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -587,11 +627,13 @@ function badge(label, present) {
   return `<span class="badge ${present ? 'badge-ok' : 'badge-missing'}">${label}</span>`
 }
 
+let currentTab = 'tasks'
+
 function openModal(p) {
   document.getElementById('modalTitle').textContent = p.name
   document.getElementById('modalSpec').innerHTML    = esc(p.specSummary ?? '') +
     (p.url ? `<br><a class="modal-url" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a>` : '')
-  document.getElementById('modalCols').innerHTML    = modalCols(p)
+  document.getElementById('modalCols').innerHTML    = modalBody(p)
   document.getElementById('overlay').classList.add('open')
 }
 
@@ -599,20 +641,117 @@ function closeModal() {
   document.getElementById('overlay').classList.remove('open')
 }
 
-function modalCols(p) {
-  const cols = []
-  if (p.tasks) cols.push(tasksSection(p.tasks))
-  if (p.plan)  cols.push(planSection(p.plan))
-  if (p.git)   cols.push(gitSection(p.git))
-  const grid = `<div class="modal-cols-grid">${cols.map(c => `<div>${c}</div>`).join('')}</div>`
-  const manual = p.tasks?.manualTasks
-  const manualHtml = manual?.length ? `<div class="modal-manual">${manualTasksSection(manual)}</div>` : ''
-  const logHtml = p.log?.entries.length ? `<div class="modal-manual">${logSection(p.log)}</div>` : ''
-  return complianceSection(p.compliance) + manualHtml + logHtml + grid
+function modalBody(p) {
+  const tabs = detailTabs(p)
+  if (!tabs.some(t => t.id === currentTab)) currentTab = tabs[0]?.id
+  const nav = tabs.map(t => `
+    <button class="tab ${t.id === currentTab ? 'active' : ''}" data-tab="${t.id}">${t.label}${
+      t.count !== undefined ? `<span class="tab-count ${t.tone ?? ''}">${t.count}</span>` : ''}</button>`).join('')
+  const panels = tabs.map(t =>
+    `<div class="tab-panel ${t.id === currentTab ? 'active' : ''}" data-panel="${t.id}">${t.html}</div>`).join('')
+  return summaryStrip(p) + nowSection(p) + (tabs.length ? `<div class="tabs">${nav}</div>${panels}` : '')
+}
+
+function selectTab(id) {
+  currentTab = id
+  document.querySelectorAll('#modalCols .tab').forEach(b => b.classList.toggle('active', b.dataset.tab === id))
+  document.querySelectorAll('#modalCols .tab-panel').forEach(el => el.classList.toggle('active', el.dataset.panel === id))
+}
+
+function detailTabs(p) {
+  const tabs = []
+  const t = p.tasks
+  if (t) tabs.push({ id: 'tasks', label: 'Tasks', count: `${t.counts.done}/${t.counts.total}`,
+                     tone: t.counts.blocked ? 'alert' : '', html: tasksSection(t) })
+  if (p.plan?.phases.length) {
+    const done = p.plan.phases.filter(ph => ph.status === 'done').length
+    tabs.push({ id: 'plan', label: 'Plano', count: `${done}/${p.plan.phases.length}`, html: planSection(p.plan) })
+  }
+  const manual = t?.manualTasks ?? []
+  if (manual.length) {
+    const pending = manual.filter(m => m.status !== 'done').length
+    tabs.push({ id: 'manual', label: 'Manuais', count: pending, tone: pending ? 'warn' : '', html: manualTasksSection(manual) })
+  }
+  if (p.log?.entries.length) tabs.push({ id: 'log', label: 'Log', count: p.log.total, html: logSection(p.log) })
+  if (p.git) tabs.push({ id: 'git', label: 'Git', html: gitSection(p.git) })
+  const c = p.compliance
+  if (c.missing.length || c.warnings.length)
+    tabs.push({ id: 'contract', label: 'Contrato', count: c.missing.length || c.warnings.length,
+                tone: c.missing.length ? 'warn' : '', html: complianceSection(c) })
+  return tabs
+}
+
+function summaryStrip(p) {
+  const pct  = completion(p)
+  const t    = p.tasks?.counts
+  const g    = p.git
+  const c    = p.compliance
+  const idle = p.activity.daysIdle
+  const kpi = (label, value, sub = '', cls = '') =>
+    `<div class="kpi ${cls}"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div>${sub}</div>`
+  const sub = s => s ? `<div class="kpi-sub">${s}</div>` : ''
+  const taskSub = t ? [t.inProgress && `${t.inProgress} em curso`, t.blocked && `${t.blocked} bloq.`].filter(Boolean).join(' · ') : ''
+  const gitSub  = g ? [g.uncommittedChanges && `${g.uncommittedChanges} por commit`, g.ahead && `↑${g.ahead} por push`].filter(Boolean).join(' · ') : ''
+  return `<div class="summary">
+    ${kpi('Fase', esc(p.phase ?? '—'))}
+    ${kpi('Progresso', `<span class="card-pct level-${lvl(pct)}" style="margin:0">${pct}%</span>`,
+          `<div class="bar"><div class="bar-fill level-${lvl(pct)}" style="width:${pct}%"></div></div>`)}
+    ${t ? kpi('Tasks', `${t.done}/${t.total}`, sub(taskSub), t.blocked ? 'alert' : '') : ''}
+    ${kpi('Atividade', idle !== null ? `${idle}d` : '—',
+          sub(p.activity.stale ? '<span style="color:var(--red)">stale</span>' : p.activity.lastLogAt ? `log ${p.activity.lastLogAt}` : ''),
+          p.activity.stale ? 'alert' : '')}
+    ${g ? kpi('Git', esc(g.currentBranch), sub(gitSub || 'limpo'), g.uncommittedChanges || g.ahead ? 'warn' : '') : ''}
+    ${kpi('Contrato', c.version === 'v2' ? 'v2 ✓' : `faltam ${c.missing.length}`, '', c.version === 'v2' ? '' : 'warn')}
+  </div>`
+}
+
+function nowSection(p) {
+  const open    = openTasks(p.tasks)
+  const wip     = open.filter(t => t.status === 'in_progress')
+  const blocked = open.filter(t => t.status === 'blocked')
+  const next    = p.log?.entries[0]?.proximo ?? []
+  const manualPending = (p.tasks?.manualTasks ?? []).filter(m => m.status !== 'done').length
+  if (!wip.length && !blocked.length && !next.length && !manualPending) return ''
+  const plural = manualPending > 1
+  return `<div class="now">
+    <div class="section-title">Agora</div>
+    ${blocked.length ? `<div class="now-label">Bloqueadas</div>${blocked.map(t => taskRow(t)).join('')}` : ''}
+    ${wip.length ? `<div class="now-label">Em curso</div>${wip.map(t => taskRow(t)).join('')}` : ''}
+    ${next.length ? `<div class="now-label">Próximo (último LOG)</div>${next.map(n =>
+        `<div class="task-row"><span class="task-icon">→</span><span>${esc(n)}</span></div>`).join('')}` : ''}
+    ${manualPending ? `<button class="now-link" data-tab="manual">${manualPending} tarefa${plural ? 's' : ''} manua${plural ? 'is' : 'l'} pendente${plural ? 's' : ''} →</button>` : ''}
+  </div>`
+}
+
+const TASK_GROUPS = [
+  { key: 'mustHave',   label: 'Must Have' },
+  { key: 'shouldHave', label: 'Should Have' },
+  { key: 'couldHave',  label: 'Could Have' },
+]
+const STATUS_ORDER = { blocked: 0, in_progress: 1, todo: 2, done: 3 }
+
+function openTasks(tasks) {
+  if (!tasks) return []
+  return TASK_GROUPS.flatMap(({ key }) => tasks.sections[key] ?? []).filter(t => t.status !== 'done')
+}
+
+function taskRow(t, { criterion = false } = {}) {
+  const blocked = t.status === 'blocked'
+  const reason = t.criterion && (blocked || criterion)
+    ? `<span class="${blocked ? 'task-reason' : 'task-crit'}">${esc(t.criterion)}</span>` : ''
+  return `
+    <div class="task-row ${TASK_CLASS[t.status]}">
+      <span class="task-icon">${TASK_ICON[t.status]}</span>
+      <span>${esc(t.title)}${t.doneAt ? `<span class="task-date">${t.doneAt}</span>` : ''}${reason}</span>
+    </div>`
+}
+
+function doneFold(items, render) {
+  if (!items.length) return ''
+  return `<details class="fold"><summary>${items.length} concluída${items.length > 1 ? 's' : ''}</summary>${items.map(t => render(t)).join('')}</details>`
 }
 
 function complianceSection({ version, missing, warnings }) {
-  if (!missing.length && !warnings.length) return ''
   const rows = [
     ...missing.map(m => `<div class="compliance-row missing"><span class="task-icon">✕</span><span>${esc(m)}</span></div>`),
     ...warnings.map(w => `<div class="compliance-row warning"><span class="task-icon">~</span><span>${esc(w)}</span></div>`),
@@ -621,64 +760,55 @@ function complianceSection({ version, missing, warnings }) {
   return `<div class="modal-compliance"><div class="section-title" style="color:var(--yellow)">${label}</div>${rows}</div>`
 }
 
-function logSection({ entries, total }) {
+function logSection({ entries }) {
   const field = (label, items, cls = '') => items.length
     ? `<div class="log-field ${cls}"><b>${label}:</b> ${items.map(esc).join(' · ')}</div>` : ''
-  const html = entries.slice(0, 3).map(e => `
-    <div class="log-entry">
-      <div class="log-head"><span class="log-date">${e.date}</span><span class="log-title">${esc(e.title)}</span></div>
-      ${field('Feito', e.feito)}
-      ${field('Próximo', e.proximo)}
-      ${field('Bloqueios', e.bloqueios, 'blocked')}
-    </div>`).join('')
-  return `<div class="section-title">Log <span class="manual-task-count">${total} entradas</span></div>${html}`
+  const body = e => field('Feito', e.feito) + field('Próximo', e.proximo) + field('Bloqueios', e.bloqueios, 'blocked')
+  const head = e => `<span class="log-date">${e.date}</span> <span class="log-title">${esc(e.title)}</span>`
+  return entries.map((e, i) => i === 0
+    ? `<div class="log-entry"><div class="log-head">${head(e)}</div>${body(e)}</div>`
+    : `<details class="fold log-entry"><summary>${head(e)}</summary>${body(e)}</details>`).join('')
 }
 
-function tasksSection({ sections, counts }) {
-  const groups = [
-    { key: 'mustHave',   label: 'Must Have' },
-    { key: 'shouldHave', label: 'Should Have' },
-    { key: 'couldHave',  label: 'Could Have' },
-  ]
-  const html = groups.map(({ key, label }) => {
+function tasksSection({ sections }) {
+  const html = TASK_GROUPS.map(({ key, label }) => {
     const items = sections[key]
     if (!items?.length) return ''
+    const open = items.filter(t => t.status !== 'done').sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
+    const done = items.filter(t => t.status === 'done')
     return `<div class="task-group">
-      <div class="task-group-label">${label}</div>
-      ${items.map(t => `
-        <div class="task-row ${TASK_CLASS[t.status]}">
-          <span class="task-icon">${TASK_ICON[t.status]}</span>
-          <span>${esc(t.title)}${t.doneAt ? `<span class="task-date">${t.doneAt}</span>` : ''}
-            ${t.status === 'blocked' && t.criterion ? `<span class="task-reason">${esc(t.criterion)}</span>` : ''}</span>
-        </div>`).join('')}
+      <div class="task-group-label">${label} <span class="tab-count">${done.length}/${items.length}</span></div>
+      ${open.length ? open.map(t => taskRow(t, { criterion: true })).join('') : '<div class="empty-note">Tudo concluído.</div>'}
+      ${doneFold(done, taskRow)}
     </div>`
   }).join('')
-  return `<div class="section-title">Tasks <span style="opacity:.5;font-size:10px">${counts.done}/${counts.total}</span></div>${html}`
+  return html || '<div class="empty-note">Sem tasks.</div>'
 }
 
 function manualTasksSection(tasks) {
-  const pending = tasks.filter(t => t.status !== 'done').length
-  const html = tasks.map(t => `
+  const row = t => `
     <div class="manual-task-row ${t.status === 'done' ? 'done' : ''}">
       <span class="task-icon">${t.status === 'done' ? '✓' : '!'}</span>
-      <span>${esc(t.title)}</span>
-    </div>`).join('')
-  return `<div class="section-title" style="color:var(--orange)">Manual Tasks <span class="manual-task-count">${pending} pending</span></div>
-    <div class="manual-tasks-grid">${html}</div>`
+      <span>${esc(t.title)}${t.status !== 'done' && t.criterion ? `<span class="task-crit">${esc(t.criterion)}</span>` : ''}</span>
+    </div>`
+  const pending = tasks.filter(t => t.status !== 'done')
+  const done    = tasks.filter(t => t.status === 'done')
+  return (pending.length ? pending.map(row).join('') : '<div class="empty-note">Nenhuma pendente.</div>') + doneFold(done, row)
 }
 
 function planSection({ phases }) {
-  const html = phases.map(ph => `
-    <div class="phase ${ph.status}">
-      <div class="phase-header">
-        <span>${esc(ph.name)}</span>
-        <span class="pct">${ph.completion}%</span>
-      </div>
-      <div class="phase-bar">
-        <div class="phase-fill" style="width:${ph.completion}%"></div>
-      </div>
-    </div>`).join('')
-  return `<div class="section-title">Plan</div>${html}`
+  const current = phases.findIndex(ph => ph.status !== 'done')
+  return phases.map((ph, i) => `
+    <details class="phase ${ph.status}" ${i === current ? 'open' : ''}>
+      <summary>
+        <div class="phase-header">
+          <span>${esc(ph.name)}</span>
+          <span class="pct">${ph.steps.filter(s => s.status === 'done').length}/${ph.steps.length} · ${ph.completion}%</span>
+        </div>
+        <div class="phase-bar"><div class="phase-fill" style="width:${ph.completion}%"></div></div>
+      </summary>
+      <div class="phase-steps">${ph.steps.map(s => taskRow(s)).join('')}</div>
+    </details>`).join('')
 }
 
 function gitSection(git) {
@@ -695,7 +825,7 @@ function gitSection(git) {
       <span class="commit-msg">${esc(c.message)}</span>
       <span class="commit-age">${age(c.date)}</span>
     </div>`).join('')
-  return `<div class="section-title">Git Log</div>${meta}<div class="commits">${commits}</div>`
+  return `${meta}<div class="commits">${commits}</div>`
 }
 
 function completion(p) {
@@ -729,6 +859,10 @@ document.getElementById('filters').addEventListener('click', e => {
   btn.classList.add('active')
   currentFilter = btn.dataset.filter
   render()
+})
+document.getElementById('modalCols').addEventListener('click', e => {
+  const btn = e.target.closest('[data-tab]')
+  if (btn) selectTab(btn.dataset.tab)
 })
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
 
