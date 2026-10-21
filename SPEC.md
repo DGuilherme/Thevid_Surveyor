@@ -37,6 +37,13 @@ Knowledge rule: project knowledge (conventions, decisions, gotchas) lives in the
 - LOG.md parser: latest entries shown in the detail panel
 - Migration support: the dashboard shows what each project lacks for v2; `templates/PROMPTS.md` provides a prompt to migrate a project and a block for the claude.ai project instructions
 
+## Skills suggestions
+Ideia registada em 2026-10-22 — ponto de partida: `docs/skills-report-2026-10-22.md`.
+- Detect each project's stack (root and first-level subfolders: `package.json` deps, `requirements.txt`/`pyproject.toml`, `Dockerfile`, Expo/React Native)
+- Show the skills/plugins already installed in the project (`.claude/skills/`, `.claude/settings.json` plugins) — read-only, never installs
+- Suggest skills from a static catalog versioned in this repo (stack → skill, with install command), e.g. Next/React → frontend-design, Expo → expo + Apple HIG, Prisma → prisma, all → Ponytail
+- Shown in a new "Skills" tab in the detail panel (UI conventions in `CLAUDE.md`)
+
 ## Out of scope (v1)
 - Write/edit tasks from the dashboard — read-only only
 - Remote repos (GitHub API) — local git only

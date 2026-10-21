@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-10-22 — Ideia: sugestões de skills por projeto
+
+**Feito:**
+- Scan de todos os projetos: 3 em v2, 8 em v1, 13 sem contrato
+- Stack de cada projeto cruzado com skills (Ponytail, Apple HIG, frontend-design, expo, prisma…)
+- Report guardado em `docs/skills-report-2026-10-22.md`; feature registada no SPEC, TASKS (Could Have) e PLAN (Phase 6)
+
+**Próximo:**
+- Decidir se a feature avança; se sim, começar pela stack detection no scanner
+- Instalar Ponytail ao nível do utilizador; expo + Apple HIG no DavidRapLog/mobile
+- Continuar migração v2 (prioridade aos 8 projetos em v1)
+
+**Bloqueios:**
+- Nenhum
+
 ## 2026-10-04 — Painel de detalhe mais legível
 
 **Feito:**

@@ -36,3 +36,9 @@
 - [x] Frontend v2 (phase, stale, ahead, deploy badges, LOG in detail)
 - [x] Migration prompts + claude.ai instructions block
 - [ ] Migrate supervised projects to v2
+
+## Phase 6: Skills suggestions (ideia)
+- [x] Report inicial: compliance v2 + stack + skills recomendadas (`docs/skills-report-2026-10-22.md`)
+- [ ] Stack detection no scanner
+- [ ] Catálogo estático stack → skill
+- [ ] Separador "Skills" no painel de detalhe

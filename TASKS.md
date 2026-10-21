@@ -46,6 +46,10 @@
   > Toolbar sort control reorders the grid
 - [ ] Search/filter by project name
   > Typing in a search box filters cards by name
+- [ ] Stack detection per project (root + first-level subfolders)
+  > API returns `stack` per project; matches the table in `docs/skills-report-2026-10-22.md`
+- [ ] Skills tab: installed skills + suggestions from a static catalog
+  > Detail panel has a "Skills" tab listing skills in the project's `.claude/` and suggested ones (name, reason, install command); catalog lives in the repo; backend stays read-only
 - [x] Filter "non-compliant" / "stale" (2026-10-01)
   > Toolbar buttons show only non-v2 or stale projects
 - [x] `> Deploy: local` opt-out in PLAN header (2026-10-01)
