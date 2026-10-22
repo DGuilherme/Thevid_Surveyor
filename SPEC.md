@@ -35,6 +35,7 @@ Knowledge rule: project knowledge (conventions, decisions, gotchas) lives in the
 - Git hygiene: uncommitted changes and unpushed commits (ahead count from local tracking refs, no fetch)
 - Deploy readiness: Dockerfile, .env.example, migrations/
 - LOG.md parser: latest entries shown in the detail panel
+- Toolbar: search by project name (filters as you type, combines with the filters) + sort selector (default: contract → activity; name A–Z; completion %; last commit); the chosen sort is remembered in the browser (`localStorage`)
 - Migration support: the dashboard shows what each project lacks for v2; `templates/PROMPTS.md` provides a prompt to migrate a project and a block for the claude.ai project instructions
 
 ## Skills suggestions

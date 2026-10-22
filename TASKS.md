@@ -42,9 +42,9 @@
   > Modal abre com uma faixa de resumo (fase, progresso, tasks, atividade, git) e um bloco "Agora" (em progresso, bloqueadas, próximo passo do LOG); o detalhe fica em separadores (Tasks, Plano, Manuais, Log, Git, Contrato); tasks concluídas e fases fechadas ficam recolhidas por defeito
 
 ## Could Have
-- [ ] Sort by completion, last commit, name
+- [x] Sort by completion, last commit, name (2026-10-22)
   > Toolbar sort control reorders the grid
-- [ ] Search/filter by project name
+- [x] Search/filter by project name (2026-10-22)
   > Typing in a search box filters cards by name
 - [x] Stack detection per project (root + first-level subfolders) (2026-10-22)
   > API returns `stack` per project; matches the table in `docs/skills-report-2026-10-22.md`

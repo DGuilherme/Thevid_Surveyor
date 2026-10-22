@@ -155,7 +155,15 @@
   .c-orange { color: var(--orange); text-shadow: 0 0 15px rgba(255,119,34,.4); }
 
   /* ── Toolbar ── */
-  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .toolbar-right { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .search, .sort {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 10px; font: inherit; font-size: 13px; outline: none;
+  }
+  .search { width: 190px; }
+  .search:focus, .sort:focus { border-color: var(--cyan); }
+  .sort { cursor: pointer; }
   .filters { display: flex; gap: 2px; }
   .filter {
     background: none;
@@ -485,7 +493,16 @@
       <button class="filter" data-filter="stale">Stale</button>
       <button class="filter" data-filter="noncompliant">Não conformes</button>
     </div>
-    <span class="shown-count" id="shownCount"></span>
+    <div class="toolbar-right">
+      <input class="search" id="search" type="search" placeholder="Pesquisar nome…" autocomplete="off">
+      <select class="sort" id="sort" title="Ordenar">
+        <option value="default">Contrato → atividade</option>
+        <option value="name">Nome A–Z</option>
+        <option value="completion">Progresso %</option>
+        <option value="commit">Último commit</option>
+      </select>
+      <span class="shown-count" id="shownCount"></span>
+    </div>
   </div>
 
   <div class="grid" id="grid"></div>
@@ -508,6 +525,9 @@ const POLL = 30_000
 
 let allProjects = []
 let currentFilter = 'all'
+let currentSearch = ''
+let currentSort = 'default'
+try { currentSort = localStorage.getItem('surveyor.sort') || 'default' } catch {}
 
 async function load(spinner = true) {
   if (spinner) document.getElementById('btnRefresh').classList.add('spinning')
@@ -528,7 +548,9 @@ async function load(spinner = true) {
 }
 
 function render() {
-  const filtered = applyFilter(allProjects, currentFilter)
+  const q = currentSearch.trim().toLowerCase()
+  const filtered = applySort(applyFilter(allProjects, currentFilter)
+    .filter(p => !q || p.name.toLowerCase().includes(q)), currentSort)
   renderStats(allProjects)
   renderGrid(filtered)
   document.getElementById('shownCount').textContent = `${filtered.length} nodes`
@@ -539,6 +561,15 @@ function applyFilter(projects, f) {
   if (f === 'incomplete') return projects.filter(p => completion(p) < 100)
   if (f === 'stale')      return projects.filter(p => p.activity.stale)
   if (f === 'noncompliant') return projects.filter(p => p.compliance.version !== 'v2')
+  return projects
+}
+
+// 'default' keeps the API order (contract version → activity)
+function applySort(projects, s) {
+  const time = p => p.activity.lastCommitAt ? new Date(p.activity.lastCommitAt).getTime() : -Infinity
+  if (s === 'name')       return [...projects].sort((a, b) => a.name.localeCompare(b.name, 'pt', { sensitivity: 'base' }))
+  if (s === 'completion') return [...projects].sort((a, b) => completion(b) - completion(a))
+  if (s === 'commit')     return [...projects].sort((a, b) => time(b) - time(a))
   return projects
 }
 
@@ -562,7 +593,9 @@ function renderStats(projects) {
 function renderGrid(projects) {
   const grid = document.getElementById('grid')
   if (!projects.length) {
-    grid.innerHTML = '<div class="empty">// NO NODES FOUND — ADD CONTRACT FILES TO PROJECTS</div>'
+    grid.innerHTML = allProjects.length
+      ? '<div class="empty">// NENHUM PROJETO CORRESPONDE À PESQUISA / FILTRO</div>'
+      : '<div class="empty">// NO NODES FOUND — ADD CONTRACT FILES TO PROJECTS</div>'
     return
   }
   grid.innerHTML = projects.map(cardHtml).join('')
@@ -891,6 +924,18 @@ document.getElementById('filters').addEventListener('click', e => {
   document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'))
   btn.classList.add('active')
   currentFilter = btn.dataset.filter
+  render()
+})
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value
+  render()
+})
+const sortSelect = document.getElementById('sort')
+if (![...sortSelect.options].some(o => o.value === currentSort)) currentSort = 'default'
+sortSelect.value = currentSort
+sortSelect.addEventListener('change', e => {
+  currentSort = e.target.value
+  try { localStorage.setItem('surveyor.sort', currentSort) } catch {}
   render()
 })
 document.getElementById('modalCols').addEventListener('click', e => {

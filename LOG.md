@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-10-22 — Ordenar a grelha e pesquisa por nome
+
+**Feito:**
+- Toolbar: caixa de pesquisa por nome (combina com os filtros) e seletor de ordenação (padrão contrato → atividade, nome A–Z, progresso %, último commit)
+- Ordenação escolhida fica guardada no browser; mensagem própria quando a pesquisa não encontra nada
+- Adicionado ao SPEC (Surveyor v2 features); verificado no browser
+
+**Próximo:**
+- Reiniciar o servidor na porta 3000 para apanhar as alterações
+- Phase 4: casos limite dos parsers (DavidRapLog mostra o resumo do spec como "...")
+- Confirmar comandos de instalação "/plugin → Discover" no catálogo de skills
+
+**Bloqueios:**
+- Nenhum
+
 ## 2026-10-22 — Separador Skills (stack + sugestões)
 
 **Feito:**
