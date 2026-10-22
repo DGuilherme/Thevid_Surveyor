@@ -46,9 +46,9 @@
   > Toolbar sort control reorders the grid
 - [ ] Search/filter by project name
   > Typing in a search box filters cards by name
-- [ ] Stack detection per project (root + first-level subfolders)
+- [x] Stack detection per project (root + first-level subfolders) (2026-10-22)
   > API returns `stack` per project; matches the table in `docs/skills-report-2026-10-22.md`
-- [ ] Skills tab: installed skills + suggestions from a static catalog
+- [x] Skills tab: installed skills + suggestions from a static catalog (2026-10-22)
   > Detail panel has a "Skills" tab listing skills in the project's `.claude/` and suggested ones (name, reason, install command); catalog lives in the repo; backend stays read-only
 - [x] Filter "non-compliant" / "stale" (2026-10-01)
   > Toolbar buttons show only non-v2 or stale projects
@@ -69,4 +69,5 @@ Ações que requerem o utilizador — o agente não pode executar estas, só reg
 
 - [ ] Correr o servidor (`npm run dev` na raiz) e abrir http://localhost:3000 antes de usar o dashboard
 - [x] Colar a secção "Thevid Surveyor" de `templates/PROMPTS.md` nas instruções do projeto no Claude do browser (2026-10-01)
+- [ ] Reiniciar o servidor do Surveyor (o que está na porta 3000 corre o código antigo) para ver o separador Skills
 - [ ] Migrar cada projeto para v2 (abrir Claude Code no projeto e usar o prompt "Migrar para contrato v2")

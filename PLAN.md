@@ -37,8 +37,8 @@
 - [x] Migration prompts + claude.ai instructions block
 - [ ] Migrate supervised projects to v2
 
-## Phase 6: Skills suggestions (ideia)
+## Phase 6: Skills suggestions
 - [x] Report inicial: compliance v2 + stack + skills recomendadas (`docs/skills-report-2026-10-22.md`)
-- [ ] Stack detection no scanner
-- [ ] Catálogo estático stack → skill
-- [ ] Separador "Skills" no painel de detalhe
+- [x] Stack detection no scanner
+- [x] Catálogo estático stack → skill
+- [x] Separador "Skills" no painel de detalhe

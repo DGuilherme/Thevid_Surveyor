@@ -439,6 +439,16 @@
   details.fold > summary:hover { color: var(--text); }
   .task-crit { display: block; font-size: 12px; color: var(--muted); }
 
+  /* ── Detail: skills ── */
+  .stack-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; font-size: 13px; padding: 3px 0; }
+  .stack-dir { color: var(--muted); font-family: Consolas, 'Courier New', monospace; font-size: 12px; min-width: 90px; }
+  .stack-tag { border: 1px solid var(--border); padding: 1px 7px; font-size: 12px; color: var(--text); }
+  .skill-row { padding: 8px 0; border-bottom: 1px solid rgba(0,255,200,.08); font-size: 14px; }
+  .skill-row:last-child { border-bottom: none; }
+  .skill-name { color: var(--cyan); font-weight: 600; }
+  .skill-meta { font-size: 11px; color: var(--muted); margin-left: 8px; font-family: Consolas, 'Courier New', monospace; }
+  .skill-install { display: block; margin-top: 4px; padding: 4px 8px; background: var(--surface); color: var(--blue); font-family: Consolas, 'Courier New', monospace; font-size: 12px; white-space: pre-wrap; }
+
   details.phase { margin-bottom: 10px; }
   details.phase > summary { list-style: none; cursor: pointer; }
   details.phase > summary::-webkit-details-marker { display: none; }
@@ -674,6 +684,8 @@ function detailTabs(p) {
   }
   if (p.log?.entries.length) tabs.push({ id: 'log', label: 'Log', count: p.log.total, html: logSection(p.log) })
   if (p.git) tabs.push({ id: 'git', label: 'Git', html: gitSection(p.git) })
+  if (p.stack?.all.length || p.skills?.installed.length)
+    tabs.push({ id: 'skills', label: 'Skills', count: p.skills.suggested.length, html: skillsSection(p) })
   const c = p.compliance
   if (c.missing.length || c.warnings.length)
     tabs.push({ id: 'contract', label: 'Contrato', count: c.missing.length || c.warnings.length,
@@ -758,6 +770,27 @@ function complianceSection({ version, missing, warnings }) {
   ].join('')
   const label = version === 'v2' ? 'Contrato v2 — avisos' : `Migração v2 — faltam ${missing.length}`
   return `<div class="modal-compliance"><div class="section-title" style="color:var(--yellow)">${label}</div>${rows}</div>`
+}
+
+function skillsSection({ stack, skills }) {
+  const tags = t => t.map(x => `<span class="stack-tag">${esc(x)}</span>`).join('')
+  const stackRows = [
+    stack.root.length && `<div class="stack-row"><span class="stack-dir">raiz</span>${tags(stack.root)}</div>`,
+    ...Object.entries(stack.sub).map(([d, t]) => `<div class="stack-row"><span class="stack-dir">${esc(d)}/</span>${tags(t)}</div>`),
+  ].filter(Boolean).join('')
+  const installed = [...skills.installed, ...skills.global.map(s => `${s} (global)`)]
+  const suggestion = s => `
+    <div class="skill-row">
+      <span class="skill-name">${esc(s.name)}</span><span class="skill-meta">${s.scope === 'user' ? 'utilizador' : 'projeto'}${s.where.length ? ' · ' + s.where.map(esc).join(', ') : ''}</span>
+      <span class="task-crit">${esc(s.reason)}</span>
+      <code class="skill-install">${esc(s.install)}</code>
+    </div>`
+  return `
+    <div class="task-group"><div class="task-group-label">Stack</div>${stackRows || '<div class="empty-note">Sem stack detetada.</div>'}</div>
+    <div class="task-group"><div class="task-group-label">Instaladas</div>${installed.length
+      ? `<div class="stack-row">${tags(installed)}</div>` : '<div class="empty-note">Nenhuma skill ou plugin no .claude/ do projeto.</div>'}</div>
+    <div class="task-group"><div class="task-group-label">Sugeridas <span class="tab-count">${skills.suggested.length}</span></div>${skills.suggested.length
+      ? skills.suggested.map(suggestion).join('') : '<div class="empty-note">Nada a sugerir.</div>'}</div>`
 }
 
 function logSection({ entries }) {

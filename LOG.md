@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-10-22 — Separador Skills (stack + sugestões)
+
+**Feito:**
+- Deteção de stack por projeto (raiz + subpastas de 1.º nível): `src/parsers/stack.js`
+- Catálogo estático stack → skill em `src/skillsCatalog.js` (Ponytail, frontend-design, expo, Apple HIG, supabase, stripe, prisma, playwright, typescript-lsp, pyright-lsp)
+- Skills instaladas lidas de `.claude/skills/` e `enabledPlugins` do projeto; plugins globais de `~/.claude/settings.json` não são sugeridos
+- Novo separador "Skills" no painel: Stack, Instaladas, Sugeridas (com comando de instalação e pasta onde se aplica)
+- Verificado: stack detetada bate com o report de 2026-10-22; separador visto no browser (DavidRapLog)
+
+**Próximo:**
+- Reiniciar o servidor na porta 3000 para apanhar as alterações
+- Confirmar os comandos de instalação marcados "/plugin → Discover" (expo, supabase, stripe, prisma) e fixá-los no catálogo
+- Could Have: ordenar a grelha e pesquisa por nome
+
+**Bloqueios:**
+- Nenhum
+
 ## 2026-10-22 — Ideia: sugestões de skills por projeto
 
 **Feito:**

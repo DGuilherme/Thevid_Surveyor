@@ -43,6 +43,8 @@ Ideia registada em 2026-10-22 — ponto de partida: `docs/skills-report-2026-10-
 - Show the skills/plugins already installed in the project (`.claude/skills/`, `.claude/settings.json` plugins) — read-only, never installs
 - Suggest skills from a static catalog versioned in this repo (stack → skill, with install command), e.g. Next/React → frontend-design, Expo → expo + Apple HIG, Prisma → prisma, all → Ponytail
 - Shown in a new "Skills" tab in the detail panel (UI conventions in `CLAUDE.md`)
+- User-level plugins are read from `~/.claude/settings.json` (`enabledPlugins`) so skills already installed globally (e.g. Ponytail) are not suggested — the only read outside PROJECTS_ROOT
+- Catalog entries without a confirmed install command point to `/plugin → Discover` instead of guessing a plugin id
 
 ## Out of scope (v1)
 - Write/edit tasks from the dashboard — read-only only

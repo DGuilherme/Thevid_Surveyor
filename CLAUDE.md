@@ -64,6 +64,8 @@ Este projeto corre localmente apenas (localhost). Não há deployment em servido
 - `src/parsers/tasks.js` — TASKS.md parser (MoSCoW, `[x] [~] [ ] [!]`, dates, criteria)
 - `src/parsers/plan.js` — PLAN.md parser (`> Fase:` / `> URL:` header + phases)
 - `src/parsers/log.js` — LOG.md parser (entries Feito / Próximo / Bloqueios)
+- `src/parsers/stack.js` — stack tags from package.json / requirements.txt / pyproject.toml / Dockerfile
+- `src/skillsCatalog.js` — static stack → skill catalog + `suggestSkills` (pure); edit here to add skills
 - `public/index.html` — dashboard (vanilla JS, polling 30s)
 - `templates/` — contract v2 templates + `PROMPTS.md` (claude.ai instructions, migration prompt)
 

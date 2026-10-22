@@ -1,17 +1,60 @@
 import fs from 'fs/promises'
 import path from 'path'
+import os from 'os'
 import { parseTasks } from './parsers/tasks.js'
 import { parsePlan } from './parsers/plan.js'
 import { parseLog } from './parsers/log.js'
+import { detectStack } from './parsers/stack.js'
+import { suggestSkills, SKILLS_CATALOG, isInstalled } from './skillsCatalog.js'
 import { readGitData } from './gitReader.js'
 
 const STALE_DAYS = 14
 const DEPLOY_PHASES = ['mvp', 'produção', 'producao']
 const QUIET_PHASES = ['pausado', 'produção', 'producao']
 const VERSION_RANK = { v2: 0, v1: 1, none: 2 }
+const SKIP_DIRS = ['node_modules', 'dist', 'build', 'venv']
 
 async function readFile(p) { return fs.readFile(p, 'utf-8').catch(() => null) }
 async function exists(p) { return fs.stat(p).then(() => true, () => false) }
+
+async function readJson(p) {
+  const raw = await readFile(p)
+  try { return raw ? JSON.parse(raw) : null } catch { return null }
+}
+
+function enabledPlugins(settings) {
+  return Object.entries(settings?.enabledPlugins ?? {}).filter(([, on]) => on).map(([name]) => name)
+}
+
+async function stackOf(dir) {
+  const [packageJson, requirements, pyproject, dockerfile] = await Promise.all(
+    ['package.json', 'requirements.txt', 'pyproject.toml', 'Dockerfile'].map(f => readFile(path.join(dir, f))))
+  return detectStack({ packageJson, requirements, pyproject, dockerfile })
+}
+
+async function readStack(dir) {
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+  const subdirs = entries.filter(e => e.isDirectory() && !e.name.startsWith('.') && !SKIP_DIRS.includes(e.name))
+  const [root, ...subs] = await Promise.all([stackOf(dir), ...subdirs.map(e => stackOf(path.join(dir, e.name)))])
+  const sub = Object.fromEntries(subdirs.map((e, i) => [e.name, subs[i]]).filter(([, tags]) => tags.length))
+  const all = [...new Set([root, ...Object.values(sub)].flat())]
+  return { root, sub, all }
+}
+
+async function readInstalledSkills(dir) {
+  const claudeDir = path.join(dir, '.claude')
+  const [skillDirs, settings, local] = await Promise.all([
+    fs.readdir(path.join(claudeDir, 'skills'), { withFileTypes: true }).catch(() => []),
+    readJson(path.join(claudeDir, 'settings.json')),
+    readJson(path.join(claudeDir, 'settings.local.json')),
+  ])
+  const skills = skillDirs.filter(e => e.isDirectory()).map(e => e.name)
+  return [...new Set([...skills, ...enabledPlugins(settings), ...enabledPlugins(local)])]
+}
+
+async function readUserPlugins() {
+  return enabledPlugins(await readJson(path.join(os.homedir(), '.claude', 'settings.json')))
+}
 
 function daysSince(date) {
   if (!date) return null
@@ -46,18 +89,20 @@ function buildCompliance({ files, plan, tasks, deploy }) {
   return { version, missing, warnings }
 }
 
-async function scanProject(dir) {
+async function scanProject(dir, userPlugins) {
   const name = path.basename(dir)
   const names = ['SPEC.md', 'PLAN.md', 'TASKS.md', 'CLAUDE.md', 'LOG.md']
   const contents = await Promise.all(names.map(f => readFile(path.join(dir, f))))
   const files = Object.fromEntries(names.map((n, i) => [n, contents[i]]))
   const [spec, plan, tasks, claude, log] = contents
 
-  const [git, dockerfile, envExample, migrations] = await Promise.all([
+  const [git, dockerfile, envExample, migrations, stack, installedSkills] = await Promise.all([
     readGitData(dir),
     exists(path.join(dir, 'Dockerfile')),
     exists(path.join(dir, '.env.example')),
     exists(path.join(dir, 'migrations')),
+    readStack(dir),
+    readInstalledSkills(dir),
   ])
 
   const parsedTasks = tasks ? parseTasks(tasks) : null
@@ -86,6 +131,12 @@ async function scanProject(dir) {
       stale: daysIdle !== null && daysIdle > STALE_DAYS && !QUIET_PHASES.includes(phase),
     },
     deploy,
+    stack,
+    skills: {
+      installed: installedSkills,
+      global: SKILLS_CATALOG.filter(e => isInstalled(e, userPlugins)).map(e => e.name),
+      suggested: suggestSkills({ stack, phase, installed: installedSkills, global: userPlugins }),
+    },
     tasks: parsedTasks,
     plan: parsedPlan,
     log: parsedLog,
@@ -99,7 +150,8 @@ export async function scanAllProjects(root) {
   const dirs = entries
     .filter(e => e.isDirectory() && !e.name.startsWith('.'))
     .map(e => path.join(root, e.name))
-  const results = await Promise.all(dirs.map(scanProject))
+  const userPlugins = await readUserPlugins()
+  const results = await Promise.all(dirs.map(d => scanProject(d, userPlugins)))
   return results.sort((a, b) =>
     VERSION_RANK[a.compliance.version] - VERSION_RANK[b.compliance.version] ||
     (a.activity.daysIdle ?? Infinity) - (b.activity.daysIdle ?? Infinity)
