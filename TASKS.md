@@ -69,5 +69,5 @@ Ações que requerem o utilizador — o agente não pode executar estas, só reg
 
 - [ ] Correr o servidor (`npm run dev` na raiz) e abrir http://localhost:3000 antes de usar o dashboard
 - [x] Colar a secção "Thevid Surveyor" de `templates/PROMPTS.md` nas instruções do projeto no Claude do browser (2026-10-01)
-- [ ] Reiniciar o servidor do Surveyor (o que está na porta 3000 corre o código antigo) para ver o separador Skills
+- [x] Reiniciar o servidor do Surveyor (o que está na porta 3000 corre o código antigo) para ver o separador Skills (2026-10-22)
 - [ ] Migrar cada projeto para v2 (abrir Claude Code no projeto e usar o prompt "Migrar para contrato v2")
