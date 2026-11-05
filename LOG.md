@@ -12,6 +12,8 @@
 
 - `PROJECTS_ROOT` configurável em `src/server.js` (env → pasta-pai do repo); `CLAUDE.md` atualizado; verificado com e sem a variável
 
+- Memória do DavidRapLog migrada para o repo (6 gotchas no `CLAUDE.md`, caminho absoluto removido; commit 38c67b65 com push)
+
 **Próximo:**
 - Reiniciar o servidor na porta 3000 para apanhar a alteração
 - Migrar a memória de todos os projetos para os repos (exceto HomeLab, N8N e E--work-Jobs), um de cada vez, começando pelo DavidRapLog
