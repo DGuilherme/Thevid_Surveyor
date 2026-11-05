@@ -54,7 +54,7 @@ Adicionado em 2026-11-05. O desenvolvimento passa a ser partilhado entre várias
 - Migração da memória para o repo é feita pelo agente dentro de cada projeto (passo 6 do prompt em `templates/PROMPTS.md`), nunca pelo backend. Infra (Cloudflare/Coolify/homelab) copiada verbatim
 - Higiene por projeto: `.claude/settings.local.json` no `.gitignore`; permissões partilhadas em `.claude/settings.json`; caminhos relativos nos ficheiros versionados
 - Repos com alterações por commitar em massa ou sem remote (ex.: ManagerPOC, javaProjects) só são listados na auditoria, nunca alterados
-- Âmbito da migração: todos os projetos de `PROJECTS_ROOT` com memória do Claude fora do repo (ex.: Thevid_Nucleo, DavidRapLog, N8N, FitVision, Mundialitos, Printatelier, Project_Whisper, Small-Bets, StockPilot, StufTracker, Thevid_TB, ThevidBG, spellforge, Thevid_Surveyor). Fora de âmbito: `HomeLab` e `E--work-Jobs`. Um projeto de cada vez
+- Âmbito da migração: todos os projetos de `PROJECTS_ROOT` com memória do Claude fora do repo (ex.: Thevid_Nucleo, DavidRapLog, FitVision, Mundialitos, Printatelier, Project_Whisper, Small-Bets, StockPilot, StufTracker, Thevid_TB, ThevidBG, spellforge, Thevid_Surveyor). Fora de âmbito: `HomeLab`, `N8N` e `E--work-Jobs`. Um projeto de cada vez
 - `docs/MULTI-MACHINE.md`: passos para pôr uma máquina nova a funcionar (clonar, `PROJECTS_ROOT`, instalar Claude Code)
 
 ## Out of scope (v1)

@@ -46,6 +46,6 @@
 ## Phase 7: Multi-machine portability
 - [x] SPEC, TASKS e PLAN atualizados (2026-11-05)
 - [ ] `PROJECTS_ROOT` configurável (env → pasta-pai do repo)
-- [ ] Migrar memória de todos os projetos para os repos (exceto HomeLab e E--work-Jobs), começando pelo N8N
+- [ ] Migrar memória de todos os projetos para os repos (exceto HomeLab, N8N e E--work-Jobs), começando pelo DavidRapLog
 - [ ] Auditoria de portabilidade no tab Contrato
 - [ ] `docs/MULTI-MACHINE.md`

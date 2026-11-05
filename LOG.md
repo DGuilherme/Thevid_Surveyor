@@ -12,7 +12,7 @@
 
 **Próximo:**
 - Implementar `PROJECTS_ROOT` configurável (env → pasta-pai do repo, sem forçar paths em macOS/Linux)
-- Migrar a memória de todos os projetos para os repos (exceto HomeLab e E--work-Jobs), um de cada vez, começando pelo N8N
+- Migrar a memória de todos os projetos para os repos (exceto HomeLab, N8N e E--work-Jobs), um de cada vez, começando pelo DavidRapLog
 - Auditoria de portabilidade no tab Contrato e `docs/MULTI-MACHINE.md`
 
 **Bloqueios:**
