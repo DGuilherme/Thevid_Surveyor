@@ -61,9 +61,12 @@
 - [ ] Must: migrar a memória do Claude de cada projeto para o seu repo (um projeto de cada vez)
   > Para cada projeto com memória (13, exceto HomeLab, N8N e E--work-Jobs): ficheiros de `~/.claude/projects/<pasta>/memory/` revistos; o que não é derivável do código está em `CLAUDE.md`/`SPEC.md` (infra verbatim, desatualizado corrigido); `.claude/settings.local.json` ignorado; commit e push feitos. Registar o progresso por projeto numa checklist neste ficheiro
   - [x] DavidRapLog (2026-11-05)
-  - [ ] Thevid_Nucleo
-  - [ ] Thevid_Surveyor
-  - [ ] FitVision · Mundialitos · Printatelier · Project_Whisper · Small-Bets
+  - [~] Thevid_Nucleo (2026-11-05: commit local 682f7ee; falta push, ver Tarefas Manuais)
+  - [x] Thevid_Surveyor (2026-11-05)
+  - [~] Printatelier (2026-11-05: CLAUDE.md criado, commit local bcc61b5; falta push)
+  - [x] adunblocker (2026-11-05: sem memória nem alterações necessárias)
+  - [~] cordas (2026-11-05: `.local` fora do git, commit local 92394e2; falta push)
+  - [ ] FitVision · Mundialitos · Project_Whisper · Small-Bets
   - [ ] StockPilot · StufTracker · Thevid_TB · ThevidBG · spellforge
 - [ ] Should: auditoria de portabilidade no tab Contrato
   > API devolve por projeto: memória fora do repo, `.local` não ignorado, caminhos absolutos, ahead, alterações por commitar, sem remote; o tab mostra-os; backend continua só de leitura
@@ -87,4 +90,6 @@ Ações que requerem o utilizador — o agente não pode executar estas, só reg
 - [ ] Correr o servidor (`npm run dev` na raiz) e abrir http://localhost:3000 antes de usar o dashboard
 - [x] Colar a secção "Thevid Surveyor" de `templates/PROMPTS.md` nas instruções do projeto no Claude do browser (2026-10-01)
 - [x] Reiniciar o servidor do Surveyor (o que está na porta 3000 corre o código antigo) para ver o separador Skills (2026-10-22)
+- [ ] Nucleo: aplicar as migrações `006` e `007` em produção (passos no `TASKS.md` do Nucleo) e só depois `git push origin main` — o push leva 11 commits e o Coolify faz deploy; sem as migrações Finanças/Refeições/Dispensa dão erro
+- [ ] Fazer push de Printatelier, cordas (só os commits de higiene; o trabalho em curso fica por commitar) e Thevid_Surveyor, e `git clone` na máquina nova
 - [ ] Migrar cada projeto para v2 (abrir Claude Code no projeto e usar o prompt "Migrar para contrato v2")

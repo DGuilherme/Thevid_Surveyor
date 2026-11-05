@@ -76,6 +76,9 @@ Validated by the user on 2026-10-04 (detail panel redesign):
 - Open tasks sorted blocked → in progress → todo. Tabs show a count, coloured when something needs attention.
 - New detail info goes into an existing or new tab, never as another stacked section.
 
+## Templates
+- Texto de infra (túnel Cloudflare, Coolify, PostgreSQL) em `templates/PROMPTS.md` e `templates/CLAUDE.md` fica **completo e verbatim**: acrescentar secções em vez de reescrever/condensar. O utilizador faz estes passos raramente e depende de todos os campos (ex.: "Path: (vazio)", "Type HTTP", caminho do menu Zero Trust). Uma versão condensada já os perdeu e foi preciso repor.
+
 ## Rules
 - Read SPEC.md before any feature change
 - Backend is read-only — never write to project files

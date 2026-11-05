@@ -13,6 +13,7 @@
 - `PROJECTS_ROOT` configurável em `src/server.js` (env → pasta-pai do repo); `CLAUDE.md` atualizado; verificado com e sem a variável
 
 - Memória do DavidRapLog migrada para o repo (6 gotchas no `CLAUDE.md`, caminho absoluto removido; commit 38c67b65 com push)
+- Memória migrada/higiene: Thevid_Nucleo (`.local` fora do git, nota SSH por máquina; 11 commits por enviar — NÃO fazer push antes das migrações 006/007), Thevid_Surveyor (regra de templates verbatim), Printatelier (CLAUDE.md novo), cordas (`.local` fora do git), adunblocker (nada a fazer)
 
 **Próximo:**
 - Reiniciar o servidor na porta 3000 para apanhar a alteração
