@@ -56,7 +56,7 @@
   > Local-only projects (like this one) stop showing the Dockerfile/.env.example warning
 
 ## Multi-machine portability (2026-11-05)
-- [ ] Must: `PROJECTS_ROOT` configurável sem forçar paths
+- [x] Must: `PROJECTS_ROOT` configurável sem forçar paths (2026-11-05)
   > `PROJECTS_ROOT` env → senão pasta-pai do repo; `src/server.js` sem `E:\\projects`; arranca no Windows e em macOS/Linux; `CLAUDE.md` (secção Rules) atualizado
 - [ ] Must: migrar a memória do Claude de cada projeto para o seu repo (um projeto de cada vez)
   > Para cada projeto com memória (13, exceto HomeLab, N8N e E--work-Jobs): ficheiros de `~/.claude/projects/<pasta>/memory/` revistos; o que não é derivável do código está em `CLAUDE.md`/`SPEC.md` (infra verbatim, desatualizado corrigido); `.claude/settings.local.json` ignorado; commit e push feitos. Registar o progresso por projeto numa checklist neste ficheiro

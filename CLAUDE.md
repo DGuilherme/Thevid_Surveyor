@@ -1,7 +1,7 @@
 # Thevid Surveyor — Claude Instructions
 
 ## Project summary
-Local read-only dashboard that scans projects in E:\projects\ and shows their real status (contract v2 compliance, tasks, plan, LOG, git, deploy readiness). Single Node.js/Express server serving a static frontend.
+Local read-only dashboard that scans the projects in PROJECTS_ROOT (default: the folder containing this repo) and shows their real status (contract v2 compliance, tasks, plan, LOG, git, deploy readiness). Single Node.js/Express server serving a static frontend.
 
 ## How to run
 ```bash
@@ -58,7 +58,7 @@ Este projeto corre localmente apenas (localhost). Não há deployment em servido
 ```
 
 ## Architecture
-- `src/server.js` — Express server, entry point, PROJECTS_ROOT, serves `public/`
+- `src/server.js` — Express server, entry point, resolves PROJECTS_ROOT, serves `public/`
 - `src/projectScanner.js` — discovers every project folder, compliance, activity, deploy readiness
 - `src/gitReader.js` — git data via simple-git (branch, commits, uncommitted, ahead/behind from local refs)
 - `src/parsers/tasks.js` — TASKS.md parser (MoSCoW, `[x] [~] [ ] [!]`, dates, criteria)
@@ -79,7 +79,7 @@ Validated by the user on 2026-10-04 (detail panel redesign):
 ## Rules
 - Read SPEC.md before any feature change
 - Backend is read-only — never write to project files
-- PROJECTS_ROOT is hardcoded in src/server.js — do not make it dynamic without updating SPEC
+- PROJECTS_ROOT = env var `PROJECTS_ROOT`, else the parent folder of this repo (set in src/server.js). Never hardcode a machine path (Windows, macOS and Linux must all work)
 - Parsers must be pure functions — no side effects
 
 ## Do not

@@ -10,8 +10,10 @@
 - Auditoria de todos os projetos: memória do Claude fora do repo (12 projetos), `.local` não ignorado (ThevidBG, Thevid_Nucleo, cordas), commits por enviar (Thevid_Nucleo 10, Surveyor 3), repos sujos/sem remote
 - SPEC (secção "Multi-machine portability"), TASKS e PLAN (fase 7) atualizados; sem código ainda
 
+- `PROJECTS_ROOT` configurável em `src/server.js` (env → pasta-pai do repo); `CLAUDE.md` atualizado; verificado com e sem a variável
+
 **Próximo:**
-- Implementar `PROJECTS_ROOT` configurável (env → pasta-pai do repo, sem forçar paths em macOS/Linux)
+- Reiniciar o servidor na porta 3000 para apanhar a alteração
 - Migrar a memória de todos os projetos para os repos (exceto HomeLab, N8N e E--work-Jobs), um de cada vez, começando pelo DavidRapLog
 - Auditoria de portabilidade no tab Contrato e `docs/MULTI-MACHINE.md`
 
