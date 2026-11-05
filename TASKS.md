@@ -55,6 +55,18 @@
 - [x] `> Deploy: local` opt-out in PLAN header (2026-10-01)
   > Local-only projects (like this one) stop showing the Dockerfile/.env.example warning
 
+## Multi-machine portability (2026-11-05)
+- [ ] Must: `PROJECTS_ROOT` configurável sem forçar paths
+  > `PROJECTS_ROOT` env → senão pasta-pai do repo; `src/server.js` sem `E:\\projects`; arranca no Windows e em macOS/Linux; `CLAUDE.md` (secção Rules) atualizado
+- [ ] Must: migrar a memória do Claude do N8N para o repo
+  > Ficheiros de `~/.claude/projects/E--projects-N8N/memory/` revistos; o que não é derivável do código está em `N8N/CLAUDE.md`/`SPEC.md` (infra verbatim, desatualizado corrigido); `.claude/settings.local.json` ignorado; commit e push feitos
+- [ ] Should: auditoria de portabilidade no tab Contrato
+  > API devolve por projeto: memória fora do repo, `.local` não ignorado, caminhos absolutos, ahead, alterações por commitar, sem remote; o tab mostra-os; backend continua só de leitura
+- [ ] Should: `docs/MULTI-MACHINE.md`
+  > Passos para uma máquina nova (clonar, `PROJECTS_ROOT`, Claude Code) para Windows, macOS e Linux
+- [ ] Could: higiene nos restantes projetos com contrato (`.local` no `.gitignore`, caminhos relativos)
+  > Feito projeto a projeto quando forem abertos; ManagerPOC e javaProjects só listados, nunca alterados
+
 ## Won't Have (v1)
 - Write/edit tasks from UI — keep read-only, edit in editor
 - GitHub API integration — local only

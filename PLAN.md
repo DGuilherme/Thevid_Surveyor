@@ -42,3 +42,10 @@
 - [x] Stack detection no scanner
 - [x] Catálogo estático stack → skill
 - [x] Separador "Skills" no painel de detalhe
+
+## Phase 7: Multi-machine portability
+- [x] SPEC, TASKS e PLAN atualizados (2026-11-05)
+- [ ] `PROJECTS_ROOT` configurável (env → pasta-pai do repo)
+- [ ] Migrar memória do N8N para o repo
+- [ ] Auditoria de portabilidade no tab Contrato
+- [ ] `docs/MULTI-MACHINE.md`

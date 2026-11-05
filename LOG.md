@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-11-05 — Planeamento: portabilidade multi-máquina
+
+**Feito:**
+- Auditoria de todos os projetos: memória do Claude fora do repo (12 projetos), `.local` não ignorado (ThevidBG, Thevid_Nucleo, cordas), commits por enviar (Thevid_Nucleo 10, Surveyor 3), repos sujos/sem remote
+- SPEC (secção "Multi-machine portability"), TASKS e PLAN (fase 7) atualizados; sem código ainda
+
+**Próximo:**
+- Implementar `PROJECTS_ROOT` configurável (env → pasta-pai do repo, sem forçar paths em macOS/Linux)
+- Migrar a memória do N8N para o repo
+- Auditoria de portabilidade no tab Contrato e `docs/MULTI-MACHINE.md`
+
+**Bloqueios:**
+- Nenhum
+
 ## 2026-10-22 — Ordenar a grelha e pesquisa por nome
 
 **Feito:**

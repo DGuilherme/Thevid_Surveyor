@@ -1,7 +1,7 @@
 # SPEC — Thevid Surveyor
 
 ## What this project does
-Local developer dashboard that scans all projects in E:\projects\ and shows their current status — tasks, plan progress, git activity, and contract health. Forces a structured development workflow by requiring a standard set of markdown files in each project.
+Local developer dashboard that scans all projects in `PROJECTS_ROOT` (default: the folder containing this repo, `E:\projects\` on the Windows PC) and shows their current status — tasks, plan progress, git activity, and contract health. Forces a structured development workflow by requiring a standard set of markdown files in each project.
 
 ## Core features
 - Project discovery: auto-detect projects that follow the contract (TASKS.md and/or PLAN.md)
@@ -46,6 +46,16 @@ Ideia registada em 2026-10-22 — ponto de partida: `docs/skills-report-2026-10-
 - Shown in a new "Skills" tab in the detail panel (UI conventions in `CLAUDE.md`)
 - User-level plugins are read from `~/.claude/settings.json` (`enabledPlugins`) so skills already installed globally (e.g. Ponytail) are not suggested — the only read outside PROJECTS_ROOT
 - Catalog entries without a confirmed install command point to `/plugin → Discover` instead of guessing a plugin id
+
+## Multi-machine portability
+Adicionado em 2026-11-05. O desenvolvimento passa a ser partilhado entre várias máquinas (PC Windows, MacBook Air, servidor Linux com Claude Code / Hermes Agent). Tudo o que o agente precisa de saber vive no repo; a memória do Claude em `~/.claude/projects/…/memory/` é só cache local.
+- `PROJECTS_ROOT` deixa de estar hardcoded: ordem de resolução = variável de ambiente `PROJECTS_ROOT` → pasta-pai do repo do Surveyor (os projetos são irmãos; no PC Windows resolve para `E:\projects`). Nenhum path de uma máquina é forçado noutra (macOS/Linux incluídos). Esta decisão substitui a regra anterior "PROJECTS_ROOT hardcoded"
+- Auditoria de portabilidade por projeto (só leitura), no tab Contrato: memória do Claude fora do repo (a localização é derivada de `PROJECTS_ROOT` e do nome da pasta), `.claude/settings.local.json` não ignorado pelo git, caminhos absolutos de uma máquina em `CLAUDE.md`/`.claude/settings.json`, commits por enviar, alterações por commitar, ausência de remote
+- Migração da memória para o repo é feita pelo agente dentro de cada projeto (passo 6 do prompt em `templates/PROMPTS.md`), nunca pelo backend. Infra (Cloudflare/Coolify/homelab) copiada verbatim
+- Higiene por projeto: `.claude/settings.local.json` no `.gitignore`; permissões partilhadas em `.claude/settings.json`; caminhos relativos nos ficheiros versionados
+- Repos com alterações por commitar em massa ou sem remote (ex.: ManagerPOC, javaProjects) só são listados na auditoria, nunca alterados
+- Âmbito da migração inicial: `N8N`. Os restantes projetos migram à medida que forem abertos (`E--work-Jobs` e `HomeLab` ficam fora por agora)
+- `docs/MULTI-MACHINE.md`: passos para pôr uma máquina nova a funcionar (clonar, `PROJECTS_ROOT`, instalar Claude Code)
 
 ## Out of scope (v1)
 - Write/edit tasks from the dashboard — read-only only
